@@ -1,0 +1,18 @@
+Package: DAME
+Type: Package
+Title: Dynamic Additive and Multiplicative Effects (DAME) Model
+Version: 0.1.0
+Author: Bomin Kim
+Maintainer: Bomin Kim <bomin8319@gmail.com>
+Description: This package contains the code used in the paper ``Dynamic Additive and Multiplicative Effects (DAME) Model with Application to the United Nations Voting Behaviors".
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports: stats,
+	fields,
+	FastGP,
+	matrixcalc,
+	Matrix,
+	LaplacesDemon,
+	truncnorm
+RoxygenNote: 7.0.2

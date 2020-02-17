@@ -1,0 +1,1594 @@
+U[1,,]
+U_true[1,,]
+print(cbind(A_inv %*% b_n, U_true[,n,r]))
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,,])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+print(cbind(A_inv %*% b_n, U_true[,n,r]))
+U[t,(n+1):N,]
+n
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,n:N,])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+U[t,n:N,]
+n
+N
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,-c(1:n),])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+n
+t(U[t,-c(1:n),])
+V
+dim(Y)
+(V %*% Y[t,-c(1:n),n])
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,-c(1:n),])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-c(1:n),n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+n
+U[t,-c(1:n),]
+t(as.matrix(U[t,-c(1:n),], nrow = 2))
+D[t,,] %*% t(as.matrix(U[t,-c(1:n),], nrow = 2))
+t(as.matrix(U[t,-c(1:n),], nrow = 1))
+D[t,,] %*% t(as.matrix(U[t,-c(1:n),], nrow = 1))
+D[t,,] %*% t(matrix(U[t,-c(1:n),], nrow = 1, ncol = R))
+(V %*% t(V))
+t(matrix(U[t,-c(1:n),], ncol = R))
+n = 2
+U[t,-c(1:n),]
+matrix(U[t,-c(1:n),], ncol = R)
+Y[t,-c(1:n),n]
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(matrix(U[t,-c(1:n),], ncol = R))#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-c(1:n),n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+U[1,,]
+U_true[1,,]
+cbind(A_inv %*% b_n, U_true[,n,r])
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(matrix(U[t,-c(1:n),], ncol = R))#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-c(1:n),n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,-n,])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-n,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+U[1,,]
+U_true[1,,]
+cor(c(U), c(U_true))
+D[t,,] %*% t(U[t,-n,])
+V %*% t(V)
+t(V)
+V
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t, ,])#
+			VV = (V[,-n] %*% t(V[-c(1:n),]))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t, ,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+n
+V
+V[,-n]
+V[-c(1:n),]
+V
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t, ,])#
+			VV = (V[,-n] %*% t(V[,-c(1:n)]))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t, ,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+n
+V[,-n]
+V[,-c(1:n)]
+VV = (V %*% t(V))
+VV
+V
+t(V)
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,-n,])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-n,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+U[1,,]
+U_true[1,,]
+V
+t(V)
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,-n,])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-n,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}
+U[t,,]
+U_true[t,,]
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,-n,])#
+			VV = (V %*% t(V))#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-n,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}#
+#
+####result#
+U[1,, ]#
+U_true[1,,]#
+#or#
+cor(c(U), c(U_true)) #should be very high since only one update
+cbind(A_inv %*% b_n, U_true[,n,r])
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar) #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_n = matrix(0, Time, Time)#
+	b_n = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,-n,])#
+			VV = (V %*% t(V)) /2#
+			VV_n[t, t] = VV[r,r]#
+			b_n[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,-n,n])[r]#
+		}#
+		A = VV_n + GPvar_inv#
+		A_inv = solve(A)#
+		U_ir = rmvnorm(1, A_inv %*% b_n, A_inv)#
+		#print(cbind(A_inv %*% b_n, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_ir[t]#
+		}#
+	}#
+}#
+#
+####result#
+U[1,, ]#
+U_true[1,,]#
+#or#
+cor(c(U), c(U_true)) #should be very high since only one update
+library(amen)
+ru_fc
+ame
+rUV_fc
+library(amen)
+ame
+rrUV_sym_fc
+rUV_sym_fc
+rUV_fc
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar)    #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar)    #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_nr= matrix(0, Time, Time)#
+	b_nr = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,,])#
+			VV = (V %*% t(V))#
+			VV_nr[t, t] = VV[r,r]#
+			b_nr[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,,n])[r]#
+		}#
+		A = VV_nr + GPvar_inv#
+		A_inv = solve(A)#
+		U_nr = rmvnorm(1, A_inv %*% b_nr, A_inv)#
+		#print(cbind(A_inv %*% b_nr, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_nr[t]#
+		}#
+	}#
+}
+U[1,, ]#
+U_true[1,,]
+Y[t,,n]
+Y[t,,]
+U[t,n,]%*%D[t,,]
+U[t,n,]%*%D[t,,]%*%t(U[t,n,])
+t(U[t,n,])
+U[t,n,]%*%D[t,,]%*%t(U[t,n,], drop = FALSE)
+t(U[t,n,])
+U[t,n,]%*%D[t,,]
+t(matrix(U[t,n,], ncol = R))
+(Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,n,], ncol = R)))
+U[t,n,]%*%D[t,,]%*%t(matrix(U[t,n,], ncol = R))
+Y[t,,n]
+U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R))
+(Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R)))
+(V %*% (Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R))))
+V %*%
+V
+Y[t,,n]
+V %*% (Y[t,,n])
+(Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R))
+)
+V %*% (Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R)))
+(V %*% t(Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R))))
+(V %*% t(Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R))))[r]
+r
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar)    #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar)    #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_nr= matrix(0, Time, Time)#
+	b_nr = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,,])#
+			VV = (V %*% t(V))#
+			VV_nr[t, t] = VV[r,r]#
+			b_nr[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% t(Y[t,,n]-U[t,n,]%*%D[t,,]%*%t(matrix(U[t,,], ncol = R))))[r]#
+		}#
+		A = VV_nr + GPvar_inv#
+		A_inv = solve(A)#
+		U_nr = rmvnorm(1, A_inv %*% b_nr, A_inv)#
+		#print(cbind(A_inv %*% b_nr, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_nr[t]#
+		}#
+	}#
+}#
+#
+####result#
+U[1,, ]#
+U_true[1,,]
+cor(c(U), c(U_true)) #should be very high since only one update
+cbind(A_inv %*% b_nr, U_true[,n,r])
+library(mvtnorm)#
+library(fields)#
+N = 20#
+R = 2#
+Time = 10#
+Y = array(0, dim = c(Time, N, N))#
+U = array(0, dim = c(Time, N, R))#
+D = array(0, dim = c(Time, R, R))#
+#
+#Below are for GP#
+kappa = 1#
+tau = 1#
+#
+dist_ij = c()#
+for (t1 in 1:Time) {#
+    for (t2 in 1:Time) {#
+    	dist_ij = c(dist_ij, abs(t1-t2))#
+    }#
+}#
+GPvar = matrix(Exponential(dist_ij, kappa), Time, Time, byrow = TRUE)#
+GPvar_inv = solve(GPvar)#
+GPvar #temporal correlation structure#
+####################
+#
+#Generate true values  #
+D_raw = rmvnorm(2, rep(0, Time), tau * GPvar)    #independent across r=1,2#
+for (t in 1:Time) {#
+	D[t,,] = diag(D_raw[,t])#
+} #
+#
+for (n in 1:N) {#
+	U_i = rmvnorm(2, rep(0, Time), tau * GPvar)    #independent across r=1,2#
+	for (t in 1:Time) {#
+		U[t,n,] = U_i[,t]#
+	} #
+}#
+#
+for (t in 1:Time) {#
+	error = matrix(0, N, N)#
+	error[upper.tri(error)] = rnorm(N*(N-1)/2, 0, 1)#
+	Y[t,,] = U[t,,] %*% D[t,,] %*% t(U[t,,]) + (error + t(error))#
+	diag(Y[t,,]) = 0#
+}#
+#
+U_true = U#
+##############
+# Given everything fixed at the true value, let's update U according to the new derivation#
+for (n in 1:N) {#
+	VV_nr= matrix(0, Time, Time)#
+	b_nr = matrix(0, Time)#
+	for (r in 1:R){#
+		for (t in 1:Time) {#
+			V = D[t,,] %*% t(U[t,,])#
+			VV = (V %*% t(V))#
+			VV_nr[t, t] = VV[r,r]#
+			b_nr[t] = 2*VV[1,2] * U[t, n, -r] + (V %*% Y[t,,n])[r]#
+		}#
+		A = VV_nr + GPvar_inv#
+		A_inv = solve(A)#
+		U_nr = rmvnorm(1, A_inv %*% b_nr, A_inv)#
+		#print(cbind(A_inv %*% b_nr, U_true[,n,r]))#
+		for (t in 1:Time) {#
+			U[t, n, r] = U_nr[t]#
+		}#
+	}#
+}#
+#
+####result#
+U[1,, ]#
+U_true[1,,]#
+#or#
+cor(c(U), c(U_true)) #should be very high since only one update
+GPvar #temporal correlation structure
+library(amen)
+ame
+rUV_sym_fc
+rUV_fc
+library(amen)
+rUV_sym_fc
+396/22
+load('~/Desktop/UN_full_new.RData'load('~/Desktop/UN_full4_new.RData'))
+load('~/Desktop/UN_full_new.RData'
+)
+load('~/Desktop/UN_full_new.RData')
+names(UN)
+plot(UN$s2)
+plot(UN$tau[,1])
+plot(UN$tau[,12)
+plot(UN$tau[,2])
+plot(UN$tau[,6], type = 'l')
+plot(UN$tau[,7], type = 'l')
+plot(UN$tau[,8], type = 'l')
+plot(UN$tau[-c(1:100),8], type = 'l')
+plot(UN$tau[-c(1:100),9], type = 'l')
+plot(UN$tau[-c(1:300),9], type = 'l')
+plot(UN$tau[-c(1:300),10], type = 'l')
+plot(UN$corr[,1])
+plot(UN$corr[,2], type = 'l')
+plot(UN$corr[,3], type = 'l')
+plot(UN$corr[,4], type = 'l')
+plot(UN$DPS[,1], type = 'l')
+plot(UN$DPS[[1]][,1], type = 'l')
+plot(UN$DPS[[1]][-c(1:300),1], type = 'l')
+plot(UN$DPS[[1]][-c(1:300),2], type = 'l')
+plot(UN$DPS[[2]][-c(1:300),2], type = 'l')
+plot(UN$DPS[[3]][-c(1:300),2], type = 'l')
+plot(UN$DPS[[4]][-c(1:300),2], type = 'l')
+UN$D
+colMeans(UN$BETA[[1]])
+colMeans(UN$BETA[[2]])
+colMeans(UN$BETA[[3]])
+colMeans(UN$BETA[[4]])
+colMeans(UN$BETA[[32]])
+colMeans(UN$BETA[[1]])
+plot(UN$Degree[[1]][,1])
+plot(UN$Degree[[1]][,1], type = 'l')
+plot(UN$Degree[[1]][,100], type = 'l')
+plot(UN$Degree[[1]][,10], type = 'l')
+exp(-1/0.001)
+setwd("⁨/Users/bomin8319/Desktop⁩/DAME_revision⁩/DAME_code_revised⁩/DAME⁩/DAME_pkg_revised/R⁩")
+setwd("⁨/Users/bomin8319/Desktop/DAME_code_revised⁩/DAME⁩/DAME_pkg_revised/R⁩")
+load('~/Desktop/DAME/UNdatafull2.RData')
+names(UNdatafull)
+load('~/Desktop/Old Research/DaveMaggie/UNdata.RData')
+hi = load('~/Desktop/Old Research/DaveMaggie/UNdata.RData')
+hi
+names(UNdata)
+UNdata$X
+load('~/Desktop/Old Research/DaveMaggie/Y.RData')
+names(Y)
+load('~/Desktop/Old Research/DaveMaggie/agreedata.RData')
+names(agreedata)
+agreedata
+length(agreedata)
+agreedata[[1]]
+names(agreedata[[1]])
+agreedata[[1]]$year
+agreedata[[1]]$network
+names(agreedata[[1]])
+agreedata[[1]]$jointvote
+names(agreedata[[1]])
+agreedata[[1]]$rcid
+load('~/Desktop/Old Research/DaveMaggie/finaldata.RData')
+names(finaldata)
+finaldata[[1]]
+length(finaldata)
+finaldata[[1]]
+names(finaldata[[1]])
+finaldata[[1]]$vote
+sapply(1:355, function(x) finaldata[[x]]$vote)
+sapply(1:355, function(x) finaldata[[x]]$vote)[1,]
+hey = sapply(1:355, function(x) finaldata[[x]]$vote)
+hey
+summary(hey[1,])
+hey
+hey$abstain
+hey = t(sapply(1:355, function(x) finaldata[[x]]$vote))
+dim(hey)
+hey[,1]
+unlist(hey[,1])
+hi = unlist(hey[,1])
+hi
+sum(hi==1)
+sum(hi==1)/length(hi)
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/DAME_revision/UN_full1.RData')
+load('~/Desktop/DAME_revision/UN_full2.RData')
+load('~/Desktop/DAME_revision/UN_full3.RData')
+load('~/Desktop/DAME_revision/UN_full4.RData')
+#########summary of results########
+## side by side plot#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+#
+n2 = 1#
+for	(n in 1:N){#
+	print(n)#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0	#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$Degree[[d]][,n2]/ rowSums(UN$Degree[[d]]), rep(hi[d], length(UN$Degree[[d]][,n2])), rep("DAME", length(UN$Degree[[d]][,n2]))))#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,], na.rm=TRUE)[n2] / sum(Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("Degree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$Degree[[d]][,n2]/ rowSums(UN2$Degree[[d]]), rep(hi[d], length(UN2$Degree[[d]][,n2])), rep("AE", length(UN2$Degree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("Degree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$Degree[[d]][,n2]/rowSums(UN3$Degree[[d]]), rep(hi[d], length(UN3$Degree[[d]][,n2])), rep("NO", length(UN3$Degree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("Degree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$Degree[[d]][,n2]/ rowSums(UN4$Degree[[d]]), rep(hi[d], length(UN4$Degree[[d]][,n2])), rep("ME", length(UN4$Degree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("Degree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("Degree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1
+n  = 97
+hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))#
+	mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, ".png")#
+print(p10[[n]])
+n = 79
+hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))#
+	mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, ".png")#
+print(p10[[n]])
+head(hellonew[[n]])
+hellonew[[n]] = hellonew[[n]][-which(hellonew[[n]]$Model == "NO"),]
+hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))#
+	mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, ".png")#
+print(p10[[n]])
+## side by side plot#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+#
+n2 = 1#
+for	(n in 1:N){#
+	print(n)#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0	#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$Degree[[d]][,n2]/ rowSums(UN$Degree[[d]]), rep(hi[d], length(UN$Degree[[d]][,n2])), rep("DAME", length(UN$Degree[[d]][,n2]))))#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,], na.rm=TRUE)[n2] / sum(Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("Degree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$Degree[[d]][,n2]/ rowSums(UN2$Degree[[d]]), rep(hi[d], length(UN2$Degree[[d]][,n2])), rep("AE", length(UN2$Degree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("Degree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$Degree[[d]][,n2]/rowSums(UN3$Degree[[d]]), rep(hi[d], length(UN3$Degree[[d]][,n2])), rep("NO", length(UN3$Degree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("Degree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$Degree[[d]][,n2]/ rowSums(UN4$Degree[[d]]), rep(hi[d], length(UN4$Degree[[d]][,n2])), rep("ME", length(UN4$Degree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("Degree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("Degree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))
+head(hellonew[[1]])
+mean[[1]]
+length(hellonew[[1]])
+hello = hellonew[[79]]#
+obs = mean[[79]]
+hello = hellonew[[79]]#
+obs = mean[[79]]#
+hey = 0 #
+for (i in 1:32) {#
+	yhat = hello[hello$Year == unique(hello$Year)[i],1]#
+	y = obs[i,1]#
+	hey = hey + sum((yhat-y)^2)#
+}
+warnings()
+yhat
+length(yhat)
+i
+hello[hello$Year == unique(hello$Year)[i],1]
+unique(hello$Year)[i]
+head(hello)
+tail(hello)
+hello = hellonew[[79]]#
+obs = mean[[79]]#
+hey = 0 #
+for (i in 1:32) {#
+	yhat = as.numeric(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1])#
+	y = obs[i,1]#
+	hey = hey + sum((yhat-y)^2)#
+}
+warnings()
+yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1]))
+yhat
+hello = hellonew[[79]]#
+obs = mean[[79]]#
+hey = 0 #
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1]))#
+	y = obs[i,1]#
+	hey = hey + sum((yhat-y)^2)#
+}
+y
+hello = hellonew[[79]]#
+obs = mean[[79]]#
+hey = 0 #
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey = hey + sum((yhat-y)^2)#
+}
+hey
+unique(hello$Model)
+hello = hellonew[[79]]#
+obs = mean[[79]]#
+hey = 0 #
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "AE",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey = hey + sum((yhat-y)^2)#
+}
+hey
+length(hellonew)
+hey = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey = hey + sum((yhat-y)^2)#
+	}#
+}
+hey
+hey2 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "ME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey2 = hey2 + sum((yhat-y)^2)#
+	}#
+}
+hey2
+hey3 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "AE",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey3 = hey3 + sum((yhat-y)^2)#
+	}#
+}
+hey3
+hey4 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "NO",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey4 = hey4 + sum((yhat-y)^2)#
+	}#
+}
+hey4
+######degree statistics#
+setwd('/Users/bomin8319/Desktop/model_validation')#
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1#
+for (n in 1:N){#
+	hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))#
+	mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, ".png")#
+print(p10[[n]])#
+ggsave(filename = mname, width = 12, height = 6)#
+}#
+#
+#seconddegree#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+countrynames = sort(rownames(UN$U[[Time]]))#
+#
+n2 = 1#
+for 	(n in 1:N){#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$secondDegree[[d]][,n2]/rowSums(UN$secondDegree[[d]]), rep(hi[d], length(UN$secondDegree[[d]][,n2])), rep("DAME", length(UN$secondDegree[[d]][,n2]))))#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2]/ sum(Y[d,,] %*% Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("SecondDegree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$secondDegree[[d]][,n2]/rowSums(UN2$secondDegree[[d]]), rep(hi[d], length(UN2$secondDegree[[d]][,n2])), rep("AE", length(UN2$secondDegree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("SecondDegree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$secondDegree[[d]][,n2]/rowSums(UN3$secondDegree[[d]]), rep(hi[d], length(UN3$secondDegree[[d]][,n2])), rep("NO", length(UN3$secondDegree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("SecondDegree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$secondDegree[[d]][,n2]/rowSums(UN4$secondDegree[[d]]), rep(hi[d], length(UN4$secondDegree[[d]][,n2])), rep("ME", length(UN4$secondDegree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("SecondDegree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]],hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("SecondDegree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1#
+for (n in 1:N){#
+	hellonew[[n]]$SecondDegree = as.numeric(as.character(hellonew[[n]]$SecondDegree))#
+	mean[[n]]$SecondDegree = as.numeric(as.character(mean[[n]]$SecondDegree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = SecondDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, "second.png")#
+print(p10[[n]])#
+ggsave(filename = mname, width = 12, height = 6)#
+}#
+#thirddegree#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+countrynames = sort(rownames(UN$U[[Time]]))#
+#
+n2 = 1#
+for 	(n in 1:N){#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$thirdDegree[[d]][,n2]/rowSums(UN$thirdDegree[[d]]), rep(hi[d], length(UN$thirdDegree[[d]][,n2])), rep("DAME", length(UN$thirdDegree[[d]][,n2]))))#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2]/sum(Y[d,,] %*% Y[d,,] %*% Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$thirdDegree[[d]][,n2]/rowSums(UN2$thirdDegree[[d]]), rep(hi[d], length(UN2$thirdDegree[[d]][,n2])), rep("AE", length(UN2$thirdDegree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$thirdDegree[[d]][,n2]/rowSums(UN3$thirdDegree[[d]]), rep(hi[d], length(UN3$thirdDegree[[d]][,n2])), rep("NO", length(UN3$thirdDegree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$thirdDegree[[d]][,n2]/rowSums(UN4$thirdDegree[[d]]), rep(hi[d], length(UN4$thirdDegree[[d]][,n2])), rep("ME", length(UN4$thirdDegree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("ThirdDegree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1#
+for (n in 1:N){#
+	hellonew[[n]]$ThirdDegree = as.numeric(as.character(hellonew[[n]]$ThirdDegree))#
+	mean[[n]]$ThirdDegree = as.numeric(as.character(mean[[n]]$ThirdDegree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = ThirdDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) +  geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, "third.png")#
+print(p10[[n]])#
+ggsave(filename = mname, width = 12, height = 6)#
+}

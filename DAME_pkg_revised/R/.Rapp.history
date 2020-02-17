@@ -1,0 +1,1670 @@
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+#
+}
+tp = 1
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,]))
+hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData')
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+#
+}
+tp = 1
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+dim(Y)
+Y[1,,]
+avail = avail1
+colnames(avail) = dimnames(Y)[[2]]
+meaningful_NA_rows = lapply(1:32, function(tp) {#
+    which(avail[tp,]==0)#
+  })
+meaningful_NA_rows
+meaningful_NA = lapply(1:32, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })
+meaningful_NA_years = which(vapply(meaningful_NA_rows, function(i) {length(i)}, c(1)) > 0)
+meaningful_NA_years
+avail = avail1#
+colnames(avail) = dimnames(Y)[[2]]#
+meaningful_NA_rows = lapply(1:32, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:32, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })#
+  meaningful_NA_years = which(vapply(meaningful_NA_rows, function(i) {length(i)}, c(1)) > 0)#
+  # to begin with, use 0 for NA's#
+    for (tp in 1:Time) {#
+      Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, ]#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+#
+}
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+#
+}
+y = 2
+tp = 2
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+tp = 3
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+tp = 4
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+tp = 5
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+tp = 6
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+Y[tp,,] %*% Y[tp, , ]
+Y[tp,,]
+na.positions
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+install.packages("FastGP")
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData')
+tp = 1
+par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+Y[tp,,]
+diag(Y[tp,,]) = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,]))
+rowSums(Y[tp,,], na.rm = TRUE)
+length(rowSums(Y[tp,,], na.rm = TRUE))
+sum(avail1[tp,])
+avail1
+UN$Degree[[tp]]
+which(avail1[tp,]==0)
+apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)], 1, mean)
+hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")
+par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")
+rowSums(Y[tp,,], na.rm = TRUE)
+length(rowSums(Y[tp,,], na.rm = TRUE))
+Y[tp,,]
+which(rownames(Y[tp,,])=="RUS")
+Y[tp,38,]
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+Y[1,38,]
+par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = sum(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+load('~/Desktop/UN_full1.RData')
+apply(UN$secondDegree[[tp]]
+UN$secondDegree[[tp]]
+UN$secondDegree[[1]]
+hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")
+tp = 1
+hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")
+hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")
+hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")
+hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")
+abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })
+meaningful_NA_rows
+meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })
+meaningful_NA
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, , ][meaningful_NA[[tp]]] = NA#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = sum(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+#
+}
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = sum(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp, , ] %*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp, , ]%*% Y[tp, , ], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+#
+}
+meaningful_NA[[tp]]
+tp = 1
+meaningful_NA[[tp]]
+diag(Y[tp,,]) = 0#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0
+Y[tp,,]
+rowSums(Y[tp,,], na.rm = TRUE)
+rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])
+rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])
+hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")
+hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")
+Y[tp,,] %*% Y[tp,,]
+rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)
+par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+#
+}
+tp
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+	} else {#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)]/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)		#
+	}#
+}
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	diag(Y[tp,,]) = 0#
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)#
+	} else {#
+	mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)		#
+	}#
+}
+tp = 10
+mname = paste0("Year", tp, ".png")#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+tp = 1
+par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	#ggsave(filename = mname, width = 12, height = 6)
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+	diag(Y[tp,,]) = 0#
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+tp = 6
+hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")
+rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])
+sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,]))
+rowSums(Y[tp,,], na.rm = TRUE)
+rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]
+sum(avail1[tp,])
+rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]
+rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])
+rowMeans(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]
+length(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)])
+rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])
+hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")
+sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,]))
+load('~/Desktop/DAME_revision/UN_full1.RData')
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+	diag(Y[tp,,]) = 0#
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+tp = 18
+par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")
+mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,]))
+which(avail1[tp,]==0)
+rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)
+tp = 18
+Y[tp,,]
+rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)
+Y[tp,,][is.na(Y[tp,,])] = 0
+rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+	diag(Y[tp,,]) = 0#
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	Y[tp,,][is.na(Y[tp,,])] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+tp = 12
+hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")
+mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,]))
+rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+	diag(Y[tp,,]) = 0#
+	Y[tp,,][is.na(Y[tp,,])] = 0#
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+Y[tp, , ][-diag(Y[tp,,])]
+diag(Y[tp,,])
+Y[tp,,]
+Y[tp, , ][upper.tri(Y[tp,,])]
+mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)
+Y[tp,,][is.na(Y[tp,,])]
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)#
+load('~/Desktop/UN_full1.RData⁩') #DAME#
+#load("/Users/bomin8319/Desktop/UN_full5.RData") #AE#
+#UN2 = UN5#
+load('~/Desktop/DAME_revision/UN_full2.RData⁩') #fixed only#
+load('~/Desktop/DAME_revision/UN_full3.RData⁩') #fixed only#
+load('~/Desktop/UN_full4.RData⁩') #multicative only using DAME#
+#
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData⁩') #DAME
+load('~/Desktop/UN_full1.RData')
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })#
+setwd('/Users/bomin8319/Desktop/GOF')
+tp = 1
+tp  =13
+mname = paste0("Year", tp, ".png")#
+    png(filename = mname)
+mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)
+mu
+row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)
+row
+row[is.na(row)] = 0
+row
+YA = mu + outer(row, row, "+")
+YA
+Y[tp,,][is.na(Y[tp,,])]
+YA[is.na(Y[tp,,])]
+diag(Y[tp,,]) = 0#
+	mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")
+YA
+YA[is.na(Y[tp,,])]
+mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)
+mu
+rowMeans(Y[tp, , ][upper.tri(Y[tp,,])] - mu, na.rm = TRUE)
+Y[tp, , ][upper.tri(Y[tp,,])]
+Y[tp, , ]
+rowMeans((Y[tp, , ] - mu)[upper.tri(Y[tp,,])], na.rm = TRUE)
+(Y[tp, , ] - mu)
+dim((Y[tp, , ] - mu))
+rowMeans((Y[tp, , ] - mu), na.rm = TRUE)
+rowMeans((Y[tp, , ] - mu), na.rm = TRUE) * (nrow(Y[tp,,]) */ (nrow(Y[tp,,])-1))
+nrow(Y[tp,,])
+rowMeans((Y[tp, , ] - mu), na.rm = TRUE) * (nrow(Y[tp,,]) / (nrow(Y[tp,,])-1))
+mu + outer(row, row, "+")
+diag(Y[tp,,]) = 0#
+	mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+    row = rowMeans((Y[tp, , ] - mu), na.rm = TRUE) * (nrow(Y[tp,,]) / (nrow(Y[tp,,])-1))#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")
+YA[is.na(Y[tp,,])]
+Y[tp, , ] - mu
+diag(Y[tp,,]) = 0#
+	mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	mid = Y[tp, , ] - mu#
+	diag(mid) = NA
+mid
+row = rowMeans(mid, na.rm = TRUE)
+row
+row[is.na(row)] = 0
+row
+YA = mu + outer(row, row, "+")
+YA
+sum(YA<0)
+YA[is.na(Y[tp,,])]
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+	mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	mid = Y[tp, , ] - mu#
+	diag(mid) = NA#
+    row = rowMeans(mid, na.rm = TRUE) #
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp,,][is.na(Y[tp,,])] =  YA[is.na(Y[tp,,])] #
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData')
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })#
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+	mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	mid = Y[tp, , ] - mu#
+	diag(mid) = NA#
+    row = rowMeans(mid, na.rm = TRUE) #
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp,,][is.na(Y[tp,,])] =  YA[is.na(Y[tp,,])] #
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+	#mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	#mid = Y[tp, , ] - mu#
+	#diag(mid) = NA#
+    #row = rowMeans(mid, na.rm = TRUE) #
+    #row[is.na(row)] = 0#
+    #YA = mu + outer(row, row, "+")#
+    #Y[tp,,][is.na(Y[tp,,])] =  YA[is.na(Y[tp,,])] #
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData')
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })#
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+    Y[tp,,][is.na(Y[tp,,])] = 0#
+	#mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	#mid = Y[tp, , ] - mu#
+	#diag(mid) = NA#
+    #row = rowMeans(mid, na.rm = TRUE) #
+    #row[is.na(row)] = 0#
+    #YA = mu + outer(row, row, "+")#
+    #Y[tp,,][is.na(Y[tp,,])] =  YA[is.na(Y[tp,,])] #
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+Y[tp,,]
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData')
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })
+tp = 12
+Y[tp,,]
+sum(avail1[tp,])
+which(avail1[tp,]==0)
+which(avail1[tp,]==0| rowSums(Y[tp,,])==0)
+rowSums(Y[tp,,])
+rowSums(Y[tp,,], na.rm = TRUE)
+diag(Y[tp,,]) = 0
+rowSums(Y[tp,,], na.rm = TRUE)
+which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)
+which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)
+abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")
+which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])
+which(rowSums(Y[tp,,], na.rm = TRUE)==0)
+sapply(1:32, function(tp) which(rowSums(Y[tp,,], na.rm = TRUE)==0))
+tp =13
+which(rowSums(Y[tp,,], na.rm = TRUE)==0)
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+    Y[tp,,][is.na(Y[tp,,])] = 0#
+	#mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	#mid = Y[tp, , ] - mu#
+	#diag(mid) = NA#
+    #row = rowMeans(mid, na.rm = TRUE) #
+    #row[is.na(row)] = 0#
+    #YA = mu + outer(row, row, "+")#
+    #Y[tp,,][is.na(Y[tp,,])] =  YA[is.na(Y[tp,,])] #
+	if (tp < 10 | tp %in% 12:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0| rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+tp
+hist(apply(UN$Degree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/(sum(avail1[tp,])-1), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")
+which(rowSums(Y[tp,,], na.rm = TRUE)==0)
+par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/(sum(avail1[tp,])-1), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")
+hist(apply(UN$thirdDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")
+sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]))
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData')
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })#
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+    Y[tp,,][is.na(Y[tp,,])] = 0#
+	#mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	#mid = Y[tp, , ] - mu#
+	#diag(mid) = NA#
+    #row = rowMeans(mid, na.rm = TRUE) #
+    #row[is.na(row)] = 0#
+    #YA = mu + outer(row, row, "+")#
+    #Y[tp,,][is.na(Y[tp,,])] =  YA[is.na(Y[tp,,])] #
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+		if (tp == 12) {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/(sum(avail1[tp,])-1), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")			#
+		} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	}#
+	dev.off()#
+}
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+    Y[tp,,][is.na(Y[tp,,])] = 0#
+	#mu = mean(Y[tp, , ][upper.tri(Y[tp,,])], na.rm = TRUE)#
+	#mid = Y[tp, , ] - mu#
+	#diag(mid) = NA#
+    #row = rowMeans(mid, na.rm = TRUE) #
+    #row[is.na(row)] = 0#
+    #YA = mu + outer(row, row, "+")#
+    #Y[tp,,][is.na(Y[tp,,])] =  YA[is.na(Y[tp,,])] #
+	if (tp < 10 | tp %in% 13:21) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(avail1[tp,]==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(avail1[tp,]==0)]/sum(avail1[tp,])), col = "red")#
+	} else {#
+		if (tp == 12) {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/(sum(avail1[tp,])-1), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-which(rowSums(Y[tp,,], na.rm = TRUE)==0)]/sum(avail1[tp,])), col = "red")			#
+		} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	}#
+	dev.off()#
+}
+rm(list=ls())
+load('~/Desktop/UN_full1.RData')
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })
+#full#
+rm(list=ls())#
+library(devtools)#
+setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
+load_all()#
+load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")#
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/UN_full1.RData')
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })
+meaningful_NA
+for (tp in 1:32) {#
+	Y[tp, , ][meaningful_NA[[tp]]] = 0#
+}
+sum(is.na(Y[tp,,]))
+Y[1,,]
+Y[12,,]
+dim(Y)
+sum(is.na(Y))
+sapply(1:32, function(x) sum(is.na(Y[x,,])))
+which(sapply(1:32, function(x) sum(is.na(Y[x,,])))>0)
+Y[13,,]
+Y[20,,]
+pureNA = sum(rowSums(Y[tp,,], na.rm = TRUE)==0))
+tp = 12
+sum(rowSums(Y[tp,,], na.rm = TRUE)==0)
+Y[tp,,]
+rowSums(Y[tp,,], na.rm = TRUE)==0
+rowSums(Y[tp,,], na.rm = TRUE)
