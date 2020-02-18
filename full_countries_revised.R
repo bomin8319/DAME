@@ -330,8 +330,62 @@ data = data.frame(cbind(years,t(betas[[i]])))
  marrangeGrob(plots[1:6], nrow = 2, ncol = 3, top = NULL)
 
 #D plots
-hey = matrix(NA, nrow = 32, ncol = 0)
-D = lapply(1:Time, function(t){summary(mcmc(UN$DPS[[t]][200:500,]))[[2]]})
+#Dout = matrix(NA, nrow = 32, ncol = 0)
+#D = lapply(1:Time, function(t){summary(mcmc(UN$DPS[[t]][200:500,]))[[2]]})
+#Ds = list()
+#for (i in 1:2) {Ds[[i]] = sapply(1:Time, function(t){D[[t]][i,]})}
+#betacols= ggplotColours(2)
+#plots = list()
+#years = c(1983:2014)
+#data = data.frame(cbind(years,t(Ds[[i]])))
+# colnames(data)[4] = "D"
+# f = ggplot(data, aes(x = years))
+#varname = c("D_1", "D_2")
+#for (i in 1:2){
+#years = c(1983:2014)
+#data = data.frame(cbind(years,t(Ds[[i]])))
+# colnames(data)[4] = "D"
+# f = ggplot(data, aes(x = years))
+# 
+# plots[[i]] <- f + geom_line(aes(y = D), colour=color[i]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) +ylab(varname[i]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()
+#Dout = cbind(Dout, data)
+# }
+# marrangeGrob(plots[1:2], nrow = 1, ncol = 2, top = NULL)
+
+#D plots UPDATED
+  meaningful_NA_rows = lapply(1:Time, function(tp) {
+    which(avail1[tp,]==0)
+  })
+Dout = matrix(NA, nrow = 32, ncol = 0)
+Dnew = UN$DPS
+for (i in 1:500) {
+		UDUPM = list()
+		for (t in 1:32) {
+			U = UN$UPS[[t]][,c(2*i-1, i*2)]
+			UDUPM[[t]] = U %*% diag(UN$DPS[[t]][i,]) %*% t(U)
+		}
+		 eULU = lapply(1:Time, function(tp) {
+    	exclude = meaningful_NA_rows[[tp]]
+    	if (length(exclude) > 0) {
+     	 eigentp = eigen(UDUPM[[tp]][-exclude, -exclude])
+    	} else {
+      	eigentp = eigen(UDUPM[[tp]])
+    	}
+    	eigentp
+  		})
+  		eR = lapply(1:Time, function(tp) {
+    	which(rank(-abs(eULU[[tp]]$val), ties.method = "first") <= 2)
+  		})
+ 	 	L =  lapply(1:Time, function(tp){
+    	eULU[[tp]]$val[eR[[tp]]]
+  		})
+  		for (t in 1:32) {
+  			Dnew[[t]][i,] = L[[t]]
+  		}
+}	
+
+
+D = lapply(1:Time, function(t){summary(mcmc(Dnew[[t]][1:500,]))[[2]]})
 Ds = list()
 for (i in 1:2) {Ds[[i]] = sapply(1:Time, function(t){D[[t]][i,]})}
 betacols= ggplotColours(2)
@@ -348,10 +402,9 @@ data = data.frame(cbind(years,t(Ds[[i]])))
  f = ggplot(data, aes(x = years))
  
  plots[[i]] <- f + geom_line(aes(y = D), colour=color[i]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + ylab(varname[i]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()
-hey = cbind(hey, data)
+Dout = cbind(Dout, data)
  }
  marrangeGrob(plots[1:2], nrow = 1, ncol = 2, top = NULL)
-
 
 
 
