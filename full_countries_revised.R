@@ -1,8 +1,8 @@
 #full
 rm(list=ls())
 library(devtools)
-setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')
-load_all()
+setwd('/Users/bomin8319/Desktop/DAME_revised/DAME_pkg_revised/R')
+#load_all()
 load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")
 attach(UNdatafull)
 library(FastGP)
@@ -37,19 +37,24 @@ avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction
 
 Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))
 corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+Degrees_nofixed = vapply(1:Time, function(tp) {rowSums(E[[tp]], na.rm = TRUE)}, rep(0, N))
+corr_nofixed = vapply(1:31, function(l) {cor(Degrees_nofixed[1:(N*(Time - l))], Degrees_nofixed[(1 + N*l):(N*Time)], use = "complete")}, 0)
 
 setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised')
 set.seed(1)
-UN = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 10000, nscan = 50000, odens = 100)
-UN2 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive"), R = 2, avail = avail1, burn = 5000, nscan = 25000, odens = 50)
-UN3 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 5000, nscan = 25000, odens = 50)
-UN4 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 10000, nscan = 50000, odens = 100)
+UN = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
 save(UN, file = "/Users/bomin8319/Desktop/UN_full1.RData")
+UN2 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
+save(UN2, file = "/Users/bomin8319/Desktop/UN_full2.RData")
+UN3 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
+save(UN3, file = "/Users/bomin8319/Desktop/UN_full3.RData")
+UN4 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
+save(UN4, file = "/Users/bomin8319/Desktop/UN_full4.RData")
 #save(UN2, file = "UN_full2.RData")
 #save(UN3, file = "UN_full3.RData")
 #save(UN4, file = "/Users/bomin8319/Desktop/UN_full4.RData")
 
-UN5 = DAME_UU_fixed_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 10000, nscan = 50000, odens = 100, kappas = rep(30, 6+1+2))
+UN5 = DAME_UU_fixed_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(30, 6+1+2))
 #save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
 #######
 load('~/Desktop/UN_full1.RData⁩') #DAME
@@ -304,7 +309,7 @@ ggsave(filename = mname, width = 12, height = 6)
 
 ##########estimated coefficients####
 #beta
-beta = lapply(1:Time, function(t){summary(mcmc(UN$BETA[[t]][1:500,]))[[2]]})
+beta = lapply(1:Time, function(t){summary(mcmc(UN$BETA[[t]][1:1000,]))[[2]]})
 betas = list()
 for (i in 1:6) {betas[[i]] = sapply(1:Time, function(t){beta[[t]][i,]})}
 betacols= ggplotColours(6)
@@ -358,7 +363,7 @@ data = data.frame(cbind(years,t(betas[[i]])))
   })
 Dout = matrix(NA, nrow = 32, ncol = 0)
 Dnew = UN$DPS
-for (i in 1:500) {
+for (i in 1:1000) {
 		UDUPM = list()
 		for (t in 1:32) {
 			U = UN$UPS[[t]][,c(2*i-1, i*2)]
@@ -385,7 +390,7 @@ for (i in 1:500) {
 }	
 
 
-D = lapply(1:Time, function(t){summary(mcmc(Dnew[[t]][1:500,]))[[2]]})
+D = lapply(1:Time, function(t){summary(mcmc(Dnew[[t]][-c(1:500),]))[[2]]})
 Ds = list()
 for (i in 1:2) {Ds[[i]] = sapply(1:Time, function(t){D[[t]][i,]})}
 betacols= ggplotColours(2)
@@ -537,7 +542,7 @@ marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
 ##Posterior predictive of degree
 setwd('/Users/bomin8319/Desktop/external')
 ggcolors = ggplotColours(3)
-datacollapse = matrix(0, nrow = 42000, ncol = 3)
+datacollapse = matrix(0, nrow = 84000, ncol = 3)
 observedcollapse = matrix(0, 28, 3)
 pp = list()
 for (tp in 1:Time) {
@@ -545,41 +550,41 @@ for (tp in 1:Time) {
 	Y[tp, which(avail1[tp, ]==0), ] = 0
 	Y[tp, , which(avail1[tp, ]==0)] = 0
 	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-		data = t(sapply(1:500, function(r){tabulate(round(UN$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
 	colnames(data) =  60:87
-	datamat = matrix(0, 500, 28)
+	datamat = matrix(0, 1000, 28)
 	colnames(datamat) = c(60:87)
-	for (i in 1:500) {
+	for (i in 1:1000) {
 		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	}
-	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 500)}))), Model = as.factor("DAME"))
+	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
 
-	 data =  t(sapply(1:500, function(r){tabulate(round(UN4$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN4$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
 	colnames(data) =  c(60:87)
-	datamat = matrix(0, 500, 28)
+	datamat = matrix(0, 1000, 28)
 	 colnames(datamat) = c(60:87)
-	 for (i in 1:500) {
+	 for (i in 1:1000) {
 		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	 }
-	 datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 500)}))), Model = as.factor("ME")))
+	 datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
 		
-	 data =  t(sapply(1:500, function(r){tabulate(round(UN2$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN2$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
 	 colnames(data) =  c(60:87)
-	 datamat = matrix(0, 500,28)
+	 datamat = matrix(0, 1000,28)
 	 colnames(datamat) = c(60:87)
-		 for (i in 1:500) {
+		 for (i in 1:1000) {
 		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	}
-	 datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 500)}))), Model = as.factor("AE")))
+	 datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
 	
-	 data =  t(sapply(1:500, function(r){tabulate(round(UN3$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
 	 colnames(data) =  c(60:87)
-	 datamat = matrix(0, 500, 28)
+	 datamat = matrix(0, 1000, 28)
 	 colnames(datamat) =c(60:87)
-		 for (i in 1:500) {
+		 for (i in 1:1000) {
 		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	}
-	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 500)}))), Model = as.factor("NO")))
+	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
 	datamat4 = datamat3
 	datamat4 = as.data.frame(datamat4)
 	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,])), 95) / sum(tabulate(round(rowSums(Y[tp,,])), 95)))[-c(1:59, 88:95)]
@@ -608,7 +613,7 @@ pp
 
 #seconddegree
 ggcolors = ggplotColours(3)
-datacollapse = matrix(0, nrow = 37500, ncol = 3)
+datacollapse = matrix(0, nrow = 2*37500, ncol = 3)
 observedcollapse = matrix(0, 25, 3)
 pp = list()
 for (tp in 1:Time) {
@@ -616,41 +621,41 @@ for (tp in 1:Time) {
 	Y[tp, which(avail1[tp, ]==0), ] = 0
 	Y[tp, , which(avail1[tp, ]==0)] = 0
 	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-	data = t(sapply(1:500, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
+	data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
 	colnames(data) =  c(45:69)
-	datamat = matrix(0, 500, 25)
+	datamat = matrix(0, 1000, 25)
 	colnames(datamat) = c(45:69)
-	for (i in 1:500) {
+	for (i in 1:1000) {
 		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	}
-	datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 500)}))), Model = as.factor("DAME"))
+	datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
 
-	data =  t(sapply(1:500, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
 	colnames(data) =  c(45:69)
-	datamat = matrix(0, 500, 25)
+	datamat = matrix(0, 1000, 25)
 	colnames(datamat) = c(45:69)
-	for (i in 1:500) {
+	for (i in 1:1000) {
 		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	}
-	datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 500)}))), Model = as.factor("ME")))
+	datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
 		
-	data =  t(sapply(1:500, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
 	colnames(data) = c(45:69)
-	datamat = matrix(0, 500, 25)
+	datamat = matrix(0, 1000, 25)
 	colnames(datamat) = c(45:69)
-		for (i in 1:500) {
+		for (i in 1:1000) {
 		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	}
-	datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 500)}))), Model = as.factor("AE")))
+	datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
 	
-	 data =  t(sapply(1:500, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]), 77)}))[,-c(1:44, 70:77)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]), 77)}))[,-c(1:44, 70:77)]
  colnames(data) =  c(45:69)
-	datamat = matrix(0, 500, 25)
+	datamat = matrix(0, 1000, 25)
 	colnames(datamat) =c(45:69)
-		 for (i in 1:500) {
+		 for (i in 1:1000) {
 		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
 	}
-	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 500)}))), Model = as.factor("NO")))
+	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
 	datamat4 = datamat3
 	datamat4 = as.data.frame(datamat4)
 	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/N)), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]
@@ -680,7 +685,7 @@ pp
 
 #thirddegree
 ggcolors = ggplotColours(3)
-datacollapse = matrix(0, nrow = 40500, ncol = 3)
+datacollapse = matrix(0, nrow = 2*40500, ncol = 3)
 observedcollapse = matrix(0, 27, 3)
 
 pp = list()
@@ -689,41 +694,41 @@ for (tp in 1:Time) {
     Y[tp, which(avail1[tp, ]==0), ] = 0
     Y[tp, , which(avail1[tp, ]==0)] = 0
     Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-    data = t(sapply(1:500, function(r){tabulate(round(UN$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
+    data = t(sapply(1:1000, function(r){tabulate(round(UN$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
     colnames(data) = c(32:58)
-    datamat = matrix(0, 500, 27)
+    datamat = matrix(0, 1000, 27)
     colnames(datamat) = c(32:58)
-    for (i in 1:500) {
+    for (i in 1:1000) {
         datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
     }
-    datamat1 = data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 500)}))), Model = as.factor("DAME"))
+    datamat1 = data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
     
-    data =  t(sapply(1:500, function(r){tabulate(round(UN4$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
+    data =  t(sapply(1:1000, function(r){tabulate(round(UN4$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
     colnames(data) =  c(32:58)
-    datamat = matrix(0, 500, 27)
+    datamat = matrix(0, 1000, 27)
     colnames(datamat) = c(32:58)
-    for (i in 1:500) {
+    for (i in 1:1000) {
         datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
     }
-    datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 500)}))), Model = as.factor("ME")))
+    datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
     
-    data =  t(sapply(1:500, function(r){tabulate(round(UN2$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
+    data =  t(sapply(1:1000, function(r){tabulate(round(UN2$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
     colnames(data) = c(32:58)
-    datamat = matrix(0, 500, 27)
+    datamat = matrix(0, 1000, 27)
     colnames(datamat) = c(32:58)
-    for (i in 1:500) {
+    for (i in 1:1000) {
         datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
     }
-    datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 500)}))), Model = as.factor("AE")))
+    datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
     
-     data =  t(sapply(1:500, function(r){tabulate(round(UN3$thirdDegree[[tp]][r,]), 66)}))[,-c(1:31, 59:66)]
+     data =  t(sapply(1:1000, function(r){tabulate(round(UN3$thirdDegree[[tp]][r,]), 66)}))[,-c(1:31, 59:66)]
     colnames(data) =  c(32:58)
-    datamat = matrix(0, 500, 27)
+    datamat = matrix(0, 1000, 27)
      colnames(datamat) =c(32:58)
-     for (i in 1:500) {
+     for (i in 1:1000) {
     datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
      }
-    datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 500)}))), Model = as.factor("NO")))
+    datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
     datamat4 = datamat3
     datamat4 = as.data.frame(datamat4)
     observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]%*% Y[tp,,]/(N*N))), 66) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,]%*% Y[tp,,] /(N*N))), 66)))[-c(1:31, 59:66)]
