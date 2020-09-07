@@ -1,0 +1,128 @@
+source('~/Desktop/DAME_revised/DAME_pkg_revised/R/DAME.R', chdir = TRUE)
+library(fields)#
+library(matrixStats)#
+library(mvtnorm)#
+library(FastGP)#
+library(LaplacesDemon)#
+library(MCMCpack)#
+library(DLFM2)#
+library(coda)#
+library(ggplot2)#
+library(gridExtra)
+40000/20
+# simulation 1-1#
+nsim = 1#
+kappas = rep(30, 4)#
+Time = 10#
+N = 20#
+R = 2#
+dist_ij = c()#
+ for (i in 1:Time) {#
+ for (j in 1:Time) {#
+ dist_ij = c(dist_ij, abs(i-j))#
+ }#
+ }#
+dist_ij = matrix(dist_ij, Time, Time)#
+BETA = lapply(1:4, function(m){matrix(0, 1, Time)})#
+THETA = lapply(1:4, function(m){matrix(0, N, Time)})#
+UDUstat = lapply(1:4, function(m){matrix(0, 2, Time)})#
+Error = rep(0, 5)#
+Error2 = rep(0, 5)#
+Error3 = rep(0, 5)#
+Error4 = rep(0, 5)#
+Kappa = rep(0, 4)#
+#
+for (s in 1:nsim){#
+print(s)#
+set.seed(s+2000)#
+    tau_p = 1/rgamma(1, 2, 1)#
+    tau_i = 1/rgamma(1, 2, 1)#
+    tau_u = 1/rgamma(2, 2, 1)#
+	beta = sapply(1:1, function(p){rmvnorm(1, rep(0, Time), tau_p * matrix(Exponential(dist_ij, kappas[p]), Time, Time, byrow = TRUE))})#
+	theta = sapply(1:N, function(i){rmvnorm(1, rep(0, Time), tau_i * matrix(Exponential(dist_ij, kappas[2]), Time, Time, byrow = TRUE))}) #
+	U1 = sapply(1:N, function(i){rmvnorm(1, rep(0, Time), tau_u[1]* matrix(Exponential(dist_ij, kappas[3]), Time, Time, byrow = TRUE))}) #
+	U2 = sapply(1:N, function(i){rmvnorm(1, rep(0, Time), tau_u[2]* matrix(Exponential(dist_ij, kappas[4]), Time, Time, byrow = TRUE))})#
+	U = lapply(1:Time , function(tp){cbind(U1[tp,], U2[tp,])})#
+	D = sapply(1:2, function(r){rmvnorm(1, rep(0, Time), diag(Time))})#
+	s2 = 1 / rgamma(1, 2, 1)#
+	U2= array(0, dim = c(Time, N, R))#
+    for (tp in 1:Time) { U2[tp, , ] = U[[tp]]}#
+	UDU = lapply(1:Time , function(tp){U[[tp]] %*% diag(D[tp,]) %*% t(U[[tp]])})#
+	UDUstats = t(sapply(1:Time , function(tp){c(sum(UDU[[tp]][upper.tri(UDU[[tp]])]), sd(UDU[[tp]][upper.tri(UDU[[tp]])]))}))#
+	Ys = array(NA, dim = c(Time , N, N))#
+	Errormat = array(0, dim = c(Time, N, N))#
+	errors = rnorm(Time * N * (N-1) / 2, 0, sqrt(s2))#
+	for (tp in 1:Time) {#
+	  Errormat[tp, , ][upper.tri(Errormat[tp, , ])] = errors[((tp-1)*N*(N-1)/2+1):(tp*N*(N-1)/2)]#
+	  Errormat[tp, , ] = (Errormat[tp, , ] + t(Errormat[tp, , ]))#
+	Ys[tp, , ] = Reduce("+", lapply(1:1, function(p) {#
+                    1 * beta[tp, p]#
+                  })) + outer(theta[tp, ], theta[tp, ], "+") + UDU[[tp]] + Errormat[tp,,]#
+	diag(Ys[tp,,]) = 0   #
+	}#
+Xnew = array(1, dim = c(Time , N, N, 1))#
+set.seed(s)#
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))#
+set.seed(s)#
+M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 40000, odens = 20)#
+M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 40000, odens = 20, kappas = rep(2, 4))#
+set.seed(s)#
+}
+# simulation 1-1#
+nsim = 1#
+kappas = rep(30, 4)#
+Time = 10#
+N = 20#
+R = 2#
+dist_ij = c()#
+ for (i in 1:Time) {#
+ for (j in 1:Time) {#
+ dist_ij = c(dist_ij, abs(i-j))#
+ }#
+ }#
+dist_ij = matrix(dist_ij, Time, Time)#
+BETA = lapply(1:4, function(m){matrix(0, 1, Time)})#
+THETA = lapply(1:4, function(m){matrix(0, N, Time)})#
+UDUstat = lapply(1:4, function(m){matrix(0, 2, Time)})#
+Error = rep(0, 5)#
+Error2 = rep(0, 5)#
+Error3 = rep(0, 5)#
+Error4 = rep(0, 5)#
+Kappa = rep(0, 4)#
+#
+for (s in 1:nsim){#
+print(s)#
+set.seed(s+2000)#
+    tau_p = 1/rgamma(1, 2, 1)#
+    tau_i = 1/rgamma(1, 2, 1)#
+    tau_u = 1/rgamma(2, 2, 1)#
+	beta = sapply(1:1, function(p){rmvnorm(1, rep(0, Time), tau_p * matrix(Exponential(dist_ij, kappas[p]), Time, Time, byrow = TRUE))})#
+	theta = sapply(1:N, function(i){rmvnorm(1, rep(0, Time), tau_i * matrix(Exponential(dist_ij, kappas[2]), Time, Time, byrow = TRUE))}) #
+	U1 = sapply(1:N, function(i){rmvnorm(1, rep(0, Time), tau_u[1]* matrix(Exponential(dist_ij, kappas[3]), Time, Time, byrow = TRUE))}) #
+	U2 = sapply(1:N, function(i){rmvnorm(1, rep(0, Time), tau_u[2]* matrix(Exponential(dist_ij, kappas[4]), Time, Time, byrow = TRUE))})#
+	U = lapply(1:Time , function(tp){cbind(U1[tp,], U2[tp,])})#
+	D = sapply(1:2, function(r){rmvnorm(1, rep(0, Time), diag(Time))})#
+	s2 = 1 / rgamma(1, 2, 1)#
+	U2= array(0, dim = c(Time, N, R))#
+    for (tp in 1:Time) { U2[tp, , ] = U[[tp]]}#
+	UDU = lapply(1:Time , function(tp){U[[tp]] %*% diag(D[tp,]) %*% t(U[[tp]])})#
+	UDUstats = t(sapply(1:Time , function(tp){c(sum(UDU[[tp]][upper.tri(UDU[[tp]])]), sd(UDU[[tp]][upper.tri(UDU[[tp]])]))}))#
+	Ys = array(NA, dim = c(Time , N, N))#
+	Errormat = array(0, dim = c(Time, N, N))#
+	errors = rnorm(Time * N * (N-1) / 2, 0, sqrt(s2))#
+	for (tp in 1:Time) {#
+	  Errormat[tp, , ][upper.tri(Errormat[tp, , ])] = errors[((tp-1)*N*(N-1)/2+1):(tp*N*(N-1)/2)]#
+	  Errormat[tp, , ] = (Errormat[tp, , ] + t(Errormat[tp, , ]))#
+	Ys[tp, , ] = Reduce("+", lapply(1:1, function(p) {#
+                    1 * beta[tp, p]#
+                  })) + outer(theta[tp, ], theta[tp, ], "+") + UDU[[tp]] + Errormat[tp,,]#
+	diag(Ys[tp,,]) = 0   #
+	}#
+Xnew = array(1, dim = c(Time , N, N, 1))#
+set.seed(s)#
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))#
+set.seed(s)#
+M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20)#
+M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(2, 4))#
+set.seed(s)#
+}

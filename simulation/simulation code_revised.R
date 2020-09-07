@@ -69,17 +69,19 @@ set.seed(s+2000)
 	}
 Xnew = array(1, dim = c(Time , N, N, 1))
 set.seed(s)
-M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(0.001, 4))
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))
 set.seed(s)
-M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20)
-M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(2, 4))
+M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20)
+M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(2, 4))
 set.seed(s)
 }
 
 Degrees = vapply(1:Time, function(tp) {rowSums(Ys[tp,,])}, rep(0, N))
 p = list()
-cordata = data.frame(rbind(M1$corr[,1:3],M2$corr[,1:3], M3$corr[,1:3]), c(rep("Fixed_Zero", 500), rep("DAME", 500), rep("Fixed_Medium", 500)))
-colnames(cordata) = c("Lag1", "Lag2", "Lag3", "Model")
+cordata = data.frame(rbind(M1$corr[,1:3],M2$corr[,1:3], M3$corr[,1:3]), c(rep("Fixed_Low", 2000), rep("DAME", 2000), rep("Fixed_Medium", 2000)))
+#colnames(cordata) = c("Lag1", "Lag2", "Lag3", "Model")
+colnames(cordata) = c("High", "Lag2", "Lag3", "Model")
+
 p[[1]] = ggplot(cordata, aes(x = Lag1, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(1:1, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal() +theme(legend.position = "bottom", legend.title = element_blank()) 
 p[[2]] = ggplot(cordata, aes(x = Lag2, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(2:2, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1)  + theme_minimal()
 p[[3]] = ggplot(cordata, aes(x = Lag3, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(3:3, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal()+ theme(legend.position = "top")
@@ -95,6 +97,9 @@ p3 <- grid.arrange(arrangeGrob(p[[1]] + theme(legend.position="none"),
                          p[[2]] + theme(legend.position="none"),
                          p[[3]] + theme(legend.position="none"), nrow=1),
              mylegend, heights=c(10, 1))
+
+final = list()
+final[[1]] = p[[1]]             
 
 # simulation 1-2
 nsim = 1
@@ -148,16 +153,16 @@ set.seed(s+2000)
 	}
 Xnew = array(1, dim = c(Time , N, N, 1))
 set.seed(s)
-M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(30, 4))
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(30, 4))
 set.seed(s)
-M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20)
-M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(2, 4))
+M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20)
+M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(2, 4))
 }
 Degrees = vapply(1:Time, function(tp) {rowSums(Ys[tp,,])}, rep(0, N))
 p = list()
-cordata = data.frame(rbind(M1$corr[,1:3],M2$corr[,1:3], M3$corr[, 1:3]), c(rep("Fixed_High", 500), rep("DAME", 500), rep("Fixed_Medium", 500)))
-colnames(cordata) = c("Lag1", "Lag2", "Lag3", "Model")
-p[[1]] = ggplot(cordata, aes(x = Lag1, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(1:1, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal() +theme(legend.position = "bottom", legend.title = element_blank()) 
+cordata = data.frame(rbind(M1$corr[,1:3],M2$corr[,1:3], M3$corr[, 1:3]), c(rep("Fixed_High", 2000), rep("DAME", 2000), rep("Fixed_Medium", 2000)))
+colnames(cordata) = c("Low", "Lag2", "Lag3", "Model")
+p[[1]] = ggplot(cordata, aes(x = Low, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(1:1, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal() +theme(legend.position = "bottom", legend.title = element_blank()) 
 p[[2]] = ggplot(cordata, aes(x = Lag2, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(2:2, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1)  + theme_minimal()
 p[[3]] = ggplot(cordata, aes(x = Lag3, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(3:3, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal()+ theme(legend.position = "top")
 #marrangeGrob(p[1:3], nrow = 1, ncol = 3, top = NULL)
@@ -172,6 +177,8 @@ p3 <- grid.arrange(arrangeGrob(p[[1]] + theme(legend.position="none"),
                          p[[2]] + theme(legend.position="none"),
                          p[[3]] + theme(legend.position="none"), nrow=1),
              mylegend, heights=c(10, 1))
+
+final[[2]] = p[[1]]             
 
 # simulation 1-3
 nsim = 1
@@ -225,16 +232,16 @@ set.seed(s+2000)
 	}
 Xnew = array(1, dim = c(Time , N, N, 1))
 set.seed(s)
-M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(30, 4))
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(30, 4))
 set.seed(s)
-M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20)
-M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(0.001, 4))
+M2 = DAME_MH_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20)
+M3 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))
 }
 Degrees = vapply(1:Time, function(tp) {rowSums(Ys[tp,,])}, rep(0, N))
 p = list()
-cordata = data.frame(rbind(M1$corr[,1:3],M2$corr[,1:3], M3$corr[, 1:3]), c(rep("Fixed_High", 500), rep("DAME", 500), rep("Fixed_Zero", 500)))
-colnames(cordata) = c("Lag1", "Lag2", "Lag3", "Model")
-p[[1]] = ggplot(cordata, aes(x = Lag1, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(1:1, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal() +theme(legend.position = "bottom", legend.title = element_blank()) 
+cordata = data.frame(rbind(M1$corr[,1:3],M2$corr[,1:3], M3$corr[, 1:3]), c(rep("Fixed_High", 2000), rep("DAME", 2000), rep("Fixed_Low", 2000)))
+colnames(cordata) = c("Medium", "Lag2", "Lag3", "Model")
+p[[1]] = ggplot(cordata, aes(x = Medium, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(1:1, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal() +theme(legend.position = "bottom", legend.title = element_blank()) 
 p[[2]] = ggplot(cordata, aes(x = Lag2, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(2:2, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1)  + theme_minimal()
 p[[3]] = ggplot(cordata, aes(x = Lag3, fill = Model, color = Model)) + geom_histogram(position = "identity", alpha = 0.5) + geom_vline(aes(xintercept = vapply(3:3, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)), col = "blue", size = 1) +theme_minimal()+ theme(legend.position = "top")
 #marrangeGrob(p[1:3], nrow = 1, ncol = 3, top = NULL)
@@ -249,6 +256,12 @@ p3 <- grid.arrange(arrangeGrob(p[[1]] + theme(legend.position="none"),
                          p[[2]] + theme(legend.position="none"),
                          p[[3]] + theme(legend.position="none"), nrow=1),
              mylegend, heights=c(10, 1))
+
+final[[3]] = p[[1]]             
+p3 <- grid.arrange(arrangeGrob(final[[1]] ,
+                         final[[2]] ,
+                         final[[3]], nrow=1),
+              heights=c(10, 1))
 ####################################################
 
 # simulation 2
@@ -308,10 +321,10 @@ set.seed(s+200)
 	}	
 Xnew = array(1, dim = c(Time , N, N, 1))
 set.seed(s)
-M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(0.001, 4))
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))
 
 set.seed(s)
-M3 = DAME_UU_fixed_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(0.001, 4))
+M3 = DAME_UU_fixed_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))
 
 }
 Degrees = vapply(1:Time, function(tp) {rowSums(Ys[tp,,])}, rep(0, N))
@@ -325,8 +338,8 @@ q = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$Degree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$Degree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("UDU", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(Degrees[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("UDU", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(Degrees[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("Degree", "Time", "Model", "Observed")
 	q[[i]] = ggplot(q_degree, aes(x = Time, y = Degree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D" ,"#00BFC4", "blue")) + scale_fill_manual(values = alpha(c("#F8766D" ,"#00BFC4"), 0.5)) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 2, group = 1)+geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 0.2, group = 1)+theme(legend.position = "bottom", legend.title = element_blank())+guides(colour = guide_legend(override.aes = list(shape = NA)))
 }
@@ -336,8 +349,8 @@ q2 = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$secondDegree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$secondDegree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("UDU", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(secondDegrees[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("UDU", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(secondDegrees[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("SecondDegree", "Time", "Model", "Observed")
 	q2[[i]] = ggplot(q_degree, aes(x = Time, y = SecondDegree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D" ,"#00BFC4", "blue")) + scale_fill_manual(values = alpha(c("#F8766D" ,"#00BFC4"), 0.5)) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 2, group = 1)+geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 0.2, group = 1)
 }
@@ -347,8 +360,8 @@ q3 = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$thirdDegree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$thirdDegree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("UDU", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(thirdDegrees[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("UDU", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(thirdDegrees[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("ThirdDegree", "Time", "Model", "Observed")
 	q3[[i]] = ggplot(q_degree, aes(x = Time, y = ThirdDegree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D","#00BFC4", "blue")) + scale_fill_manual(values = alpha(c("#F8766D" ,"#00BFC4"), 0.5)) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 2, group = 1)+geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 0.2, group = 1)
 }
@@ -421,10 +434,10 @@ set.seed(s+200)
 	}	
 Xnew = array(1, dim = c(Time , N, N, 1))
 set.seed(s)
-M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(0.001, 4))
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))
 
 set.seed(s)
-M3 = DAME_UU_fixed_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(0.001, 4))
+M3 = DAME_UU_fixed_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))
 
 }
 Degrees2 = vapply(1:Time, function(tp) {rowSums(Ys[tp,,])}, rep(0, N))
@@ -433,8 +446,8 @@ m = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$Degree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$Degree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("DAME", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(Degrees2[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("DAME", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(Degrees2[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("Degree", "Time", "Model", "Observed")
 	m[[i]] = ggplot(q_degree, aes(x = Time, y = Degree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D","#00BFC4", "blue")) + scale_fill_manual(values = alpha(c("#F8766D","#00BFC4"), 0.5)) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 2, group = 1)+geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 0.2, group = 1)+theme(legend.position = "bottom", legend.title = element_blank())+guides(colour = guide_legend(override.aes = list(shape = NA)))
 }
@@ -444,8 +457,8 @@ m2 = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$secondDegree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$secondDegree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("DAME", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(secondDegrees2[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("DAME", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(secondDegrees2[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("SecondDegree", "Time", "Model", "Observed")
 	m2[[i]] = ggplot(q_degree, aes(x = Time, y = SecondDegree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D","#00BFC4","blue")) + scale_fill_manual(values = alpha(c("#F8766D","#00BFC4"), 0.5)) + geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 0.2, group = 1) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 2, group = 1)
 }
@@ -455,8 +468,8 @@ m3 = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$thirdDegree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$thirdDegree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("DAME", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(thirdDegrees2[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("DAME", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(thirdDegrees2[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("ThirdDegree", "Time", "Model", "Observed")
 	m3[[i]] = ggplot(q_degree, aes(x = Time, y = ThirdDegree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D", "#00BFC4", "blue")) + scale_fill_manual(values = alpha(c("#F8766D", "#00BFC4"), 0.5)) + geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 0.2, group = 1) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 2, group = 1)
 }
@@ -533,10 +546,10 @@ set.seed(s+200)
 	}	
 Xnew = array(1, dim = c(Time , N, N, 1))
 set.seed(s)
-M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens =20, kappas = rep(0.001, 4))
+M1 = DAME_fix_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens =20, kappas = rep(0.001, 4))
 
 set.seed(s)
-M3 = DAME_UU_fixed_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 2000, nscan = 10000, odens = 20, kappas = rep(0.001, 4))
+M3 = DAME_UU_fixed_revised(Ys, Xnew, RE = c("additive", "multiplicative"), gammapriors = c(2, 1), dist = "Exponential", avail = matrix(1, Time , N), R =2, burn = 8000, nscan = 40000, odens = 20, kappas = rep(0.001, 4))
 
 }
 Degrees2 = vapply(1:Time, function(tp) {rowSums(Ys[tp,,])}, rep(0, N))
@@ -545,8 +558,8 @@ k = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$Degree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$Degree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("DAME", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(Degrees2[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("DAME", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(Degrees2[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("Degree", "Time", "Model", "Observed")
 	k[[i]] = ggplot(q_degree, aes(x = Time, y = Degree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D","#00BFC4", "blue")) + scale_fill_manual(values = alpha(c("#F8766D","#00BFC4"), 0.5)) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 2, group = 1)+geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 0.2, group = 1)+theme(legend.position = "bottom", legend.title = element_blank())+guides(colour = guide_legend(override.aes = list(shape = NA)))
 }
@@ -556,8 +569,8 @@ k2 = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$secondDegree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$secondDegree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("DAME", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(secondDegrees2[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("DAME", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(secondDegrees2[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("SecondDegree", "Time", "Model", "Observed")
 	k2[[i]] = ggplot(q_degree, aes(x = Time, y = SecondDegree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D","#00BFC4","blue")) + scale_fill_manual(values = alpha(c("#F8766D","#00BFC4"), 0.5)) + geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 0.2, group = 1) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 2, group = 1)
 }
@@ -567,8 +580,8 @@ k3 = list()
 for (i in 1:N) {
 	M1_degree = lapply(1:Time, function(tp) {M1$thirdDegree[[tp]][,i]})
 	M3_degree = lapply(1:Time, function(tp) {M3$thirdDegree[[tp]][,i]})
-	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), as.factor(c(vapply(1:Time, function(tp) {rep(tp, 500)}, rep(0, 500)))), as.factor(c(rep("DAME", 5000), rep("UU", 5000))))
-	q_degree$observed = c(vapply(1:Time, function(tp) {rep(thirdDegrees2[i, tp], 500)}, rep(0, 500)))
+	q_degree = data.frame(c(unlist(M1_degree), unlist(M3_degree)), rep(as.factor(c(vapply(1:Time, function(tp) {rep(tp, 2000)}, rep(0, 2000)))),2), as.factor(c(rep("DAME", 4*5000), rep("UU", 4*5000))))
+	q_degree$observed = c(rep(vapply(1:Time, function(tp) {rep(thirdDegrees2[i, tp], 2000)}, rep(0, 2000)),2))
 	colnames(q_degree) = c("ThirdDegree", "Time", "Model", "Observed")
 	k3[[i]] = ggplot(q_degree, aes(x = Time, y = ThirdDegree, fill= Model,color= Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() + scale_color_manual(values = c("#F8766D", "#00BFC4", "blue")) + scale_fill_manual(values = alpha(c("#F8766D", "#00BFC4"), 0.5)) + geom_line(data = q_degree, aes(x = Time, y = Observed), color = "blue", size = 0.2, group = 1) + geom_point(data = q_degree, aes(x = Time, y = Observed), color = "blue",size = 2, group = 1)
 }

@@ -427,7 +427,7 @@ DAME_fix_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, d
     if ("additive" %in% RE) {
     	theta[tp, ] = row
     	}
-    	if ("multipicative" %in% RE) {
+    	if ("multiplicative" %in% RE) {
     eigenError = eigen(Y[tp, , ] - YA)
     eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)
     signs = eigenError$val[eR]
@@ -458,7 +458,7 @@ DAME_fix_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, d
       theta[tp, meaningful_NA_rows[[tp]]] = 0
     }
     }
-    if ("multipicative" %in% RE) {
+    if ("multiplicative" %in% RE) {
     if (iter > 0.2 * burn) {
     		tau_u = rtauu_fc(U, cinv[(P+2):(P+1+R)], a, b)
        	d = rd_fc2_revised(XB, theta, U, d, Y, s2, meaningful_NA)
@@ -569,7 +569,7 @@ DAME_fix_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, d
 GPpost = function(kappa, parameter, tau, dist_ij, a, b) {
     if (kappa > 0 & tau > 0) {
         lprior1 = dhalfcauchy(kappa, 5, log = TRUE)
-        lprior2 = sum(dinvgamma(tau, a, b, log = TRUE))
+        lprior2 = sum(LaplacesDemon::dinvgamma(tau, a, b, log = TRUE))
         Time = nrow(parameter)
         covfcmat = Exponential(dist_ij, kappa, phi = tau)
         if (is.positive.definite(covfcmat) == FALSE) {covfcmat = as.matrix(nearPD(covfcmat)$mat)}
@@ -709,7 +709,7 @@ DAME_MH_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, di
     beta[tp, 1] = mu
     if ("additive" %in% RE) {
       theta[tp, ] = row}
-    if ("multipicative" %in% RE) {
+    if ("multiplicative" %in% RE) {
       eigenError = eigen(Y[tp, , ] - YA)
       eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)
       signs = eigenError$val[eR]
@@ -986,7 +986,7 @@ DAME_UU_fixed_revised = function(Y, X, RE = c("additive", "multiplicative"), R =
         if ("additive" %in% RE) {
       	theta[tp, ] = row
       	}
-      	if ("multipicative" %in% RE) {
+      	if ("multiplicative" %in% RE) {
       	eigenError = eigen(Y[tp, , ] - YA)
       	eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)
       	signs = eigenError$val[eR]

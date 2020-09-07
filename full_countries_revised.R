@@ -37,8 +37,8 @@ avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction
 
 Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))
 corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
-Degrees_nofixed = vapply(1:Time, function(tp) {rowSums(E[[tp]], na.rm = TRUE)}, rep(0, N))
-corr_nofixed = vapply(1:31, function(l) {cor(Degrees_nofixed[1:(N*(Time - l))], Degrees_nofixed[(1 + N*l):(N*Time)], use = "complete")}, 0)
+#Degrees_nofixed = vapply(1:Time, function(tp) {rowSums(E[[tp]], na.rm = TRUE)}, rep(0, N))
+#corr_nofixed = vapply(1:31, function(l) {cor(Degrees_nofixed[1:(N*(Time - l))], Degrees_nofixed[(1 + N*l):(N*Time)], use = "complete")}, 0)
 
 setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised')
 set.seed(1)
@@ -56,7 +56,13 @@ save(UN4, file = "/Users/bomin8319/Desktop/UN_full4.RData")
 
 UN5 = DAME_UU_fixed_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(30, 6+1+2))
 #save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
-#######
+#################
+
+UN = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 50000, nscan = 100000, odens = 50)
+save(UN, file = "/Users/bomin8319/Desktop/UN_full_long.RData")
+
+
+#####################
 load('~/Desktop/UN_full1.RData⁩') #DAME
 #load("/Users/bomin8319/Desktop/UN_full5.RData") #AE
 #UN2 = UN5
@@ -309,7 +315,7 @@ ggsave(filename = mname, width = 12, height = 6)
 
 ##########estimated coefficients####
 #beta
-beta = lapply(1:Time, function(t){summary(mcmc(UN$BETA[[t]][1:1000,]))[[2]]})
+beta = lapply(1:Time, function(t){summary(mcmc(UN$BETA[[t]][1:2000,]))[[2]]})
 betas = list()
 for (i in 1:6) {betas[[i]] = sapply(1:Time, function(t){beta[[t]][i,]})}
 betacols= ggplotColours(6)
@@ -363,7 +369,7 @@ data = data.frame(cbind(years,t(betas[[i]])))
   })
 Dout = matrix(NA, nrow = 32, ncol = 0)
 Dnew = UN$DPS
-for (i in 1:1000) {
+for (i in 1:2000) {
 		UDUPM = list()
 		for (t in 1:32) {
 			U = UN$UPS[[t]][,c(2*i-1, i*2)]
@@ -390,7 +396,7 @@ for (i in 1:1000) {
 }	
 
 
-D = lapply(1:Time, function(t){summary(mcmc(Dnew[[t]][-c(1:500),]))[[2]]})
+D = lapply(1:Time, function(t){summary(mcmc(Dnew[[t]]))[[2]]})
 Ds = list()
 for (i in 1:2) {Ds[[i]] = sapply(1:Time, function(t){D[[t]][i,]})}
 betacols= ggplotColours(2)
@@ -755,3 +761,107 @@ pp = ggplot(datacollapse, aes(x = thirdDegree, y = Proportion,fill = Model, colo
 datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
 #pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
 pp
+
+
+
+
+#convergence check
+library(coda)
+  meaningful_NA_rows = lapply(1:Time, function(tp) {
+    which(avail1[tp,]==0)
+  })
+Dout = matrix(NA, nrow = 32, ncol = 0)
+Dnew = UN$DPS
+Unew = UN$UPS
+for (i in 1:2000) {
+		UDUPM = list()
+		for (t in 1:32) {
+			U = UN$UPS[[t]][,c(2*i-1, i*2)]
+			UDUPM[[t]] = U %*% diag(UN$DPS[[t]][i,]) %*% t(U)
+		}
+		 eULU = lapply(1:Time, function(tp) {
+    	exclude = meaningful_NA_rows[[tp]]
+    	if (length(exclude) > 0) {
+     	 eigentp = eigen(UDUPM[[tp]][-exclude, -exclude])
+    	} else {
+      	eigentp = eigen(UDUPM[[tp]])
+    	}
+    	eigentp
+  		})
+  		eR = lapply(1:Time, function(tp) {
+    	which(rank(-abs(eULU[[tp]]$val), ties.method = "first") <= 2)
+  		})
+ 	 	L =  lapply(1:Time, function(tp){
+    	eULU[[tp]]$val[eR[[tp]]]
+  		})
+  		eV =  lapply(1:Time, function(tp){
+    	eULU[[tp]]$vec[,eR[[tp]]]
+  		})
+  		for (t in 1:32) {
+  			Dnew[[t]][i,] = L[[t]]
+  			if (length(meaningful_NA_rows[[t]]) > 0) {
+  				exclude = meaningful_NA_rows[[t]]
+  				Unew[[t]][-exclude,2*i] = eV[[t]][,2]	
+  				Unew[[t]][-exclude,2*i-1] = eV[[t]][,1]			
+  			} else {
+  			Unew[[t]][,2*i] = eV[[t]][,2]	
+  			Unew[[t]][,2*i-1] = eV[[t]][,1]			
+  			}
+  		}
+}	
+
+
+output = c()
+for (i in 1:32) {
+	for (j in 1:6) {
+	s = gelman.diag(mcmc.list(mcmc(UN$BETA[[i]][1:1000,j]), mcmc(UN$BETA[[i]][1001:2000,j])))
+	output = rbind(output, c(i, j, unlist(s)))
+	}
+}
+
+output2 = c()
+for (i in 1:32) {
+	for (j in 1:97) {
+	s = gelman.diag(mcmc.list(mcmc(UN$theta[[i]][1:1000,j]), mcmc(UN$theta[[i]][1001:2000,j])))
+	output2 = rbind(output2, c(i, j, unlist(s)))
+	}
+}
+
+output3 = c()
+for (j in 1:9) {
+	s = gelman.diag(mcmc.list(mcmc(UN$tau[1:1000, j]), mcmc(UN$tau[1001:2000,j])))
+	output3 = rbind(output3, c(j, unlist(s)))
+}
+
+output4 = c()
+for (j in 1:9) {
+	s = gelman.diag(mcmc.list(mcmc(UN$kappas[1:1000, j]), mcmc(UN$kappas[1001:2000,j])))
+	output4 = rbind(output4, c(j, unlist(s)))
+}
+
+output5 = c()
+for (i in 1:32) {
+	for (j in 1:2) {
+		s = gelman.diag(mcmc.list(mcmc(Dnew[[i]][1:1000, j]), mcmc(Dnew[[i]][1001:2000,j])))
+		output5 = rbind(output5, c(i, j, unlist(s)))
+	}
+}
+
+output6 = c()
+for (i in 1:32) {
+	for (j in 1:97) {
+		s = gelman.diag(mcmc.list(mcmc(Unew[[i]][j, 2*(1:1000)-1]), mcmc(Unew[[i]][j, 2*(1001:2000)-1])))
+		output6 = rbind(output6, c(i, j, unlist(s)))
+	}
+}
+
+output7 = c()
+for (i in 1:32) {
+	for (j in 1:97) {
+		s = gelman.diag(mcmc.list(mcmc(Unew[[i]][j, 2*(1:1000)]), mcmc(Unew[[i]][j, 2*(1001:2000)])))
+		output7 = rbind(output7, c(i, j, unlist(s)))
+	}
+}
+
+gelman.diag = list(beta = output, theta = output2, tau = output3, kappa = output4, D = output5, U1 = output6, U2 = output7)
+save(gelman.diag, file = "gelmandiag.RData")
