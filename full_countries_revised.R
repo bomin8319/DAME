@@ -54,14 +54,22 @@ save(UN4, file = "/Users/bomin8319/Desktop/UN_full4.RData")
 #save(UN3, file = "UN_full3.RData")
 #save(UN4, file = "/Users/bomin8319/Desktop/UN_full4.RData")
 
-UN5 = DAME_UU_fixed_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(30, 6+1+2))
+UN5 = DAME_UU_fixed_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(10, 6+1+2))
 #save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
 #################
 
-UN = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 50000, nscan = 100000, odens = 50)
+UN = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 50000, nscan = 100000, odens = 50)
 save(UN, file = "/Users/bomin8319/Desktop/UN_full_long.RData")
+UN2 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("additive"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
+save(UN2, file = "/Users/bomin8319/Desktop/UN_full2.RData")
+UN3 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
+save(UN3, file = "/Users/bomin8319/Desktop/UN_full3.RData")
+UN5 = DAME_UU_fixed_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(10, 6+1+2))
+save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
 
 
+UN5 = DAME_UU_fixed_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 2000, nscan = 5000, odens = 10, kappas = rep(10, 6+1+2))
+UN6 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 2000, nscan = 5000, odens = 10)
 #####################
 load('~/Desktop/UN_full1.RData⁩') #DAME
 #load("/Users/bomin8319/Desktop/UN_full5.RData") #AE
@@ -70,6 +78,7 @@ load('~/Desktop/DAME_revision/UN_full2.RData⁩') #fixed only
 load('~/Desktop/DAME_revision/UN_full3.RData⁩') #fixed only
 #load('~/Desktop/UN_full4.RData⁩') #multicative only using DAME
 UN4 = UN5
+
 #########summary of results#######
 ## side by side plot
 hi = factor(1983:2014)
@@ -556,8 +565,8 @@ for (tp in 1:Time) {
 	Y[tp, which(avail1[tp, ]==0), ] = 0
 	Y[tp, , which(avail1[tp, ]==0)] = 0
 	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
-	colnames(data) =  60:87
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
+	colnames(data) =  c(60:87)
 	datamat = matrix(0, 1000, 28)
 	colnames(datamat) = c(60:87)
 	for (i in 1:1000) {
@@ -565,7 +574,7 @@ for (tp in 1:Time) {
 	}
 	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
 
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN4$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN4$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
 	colnames(data) =  c(60:87)
 	datamat = matrix(0, 1000, 28)
 	 colnames(datamat) = c(60:87)
@@ -574,7 +583,7 @@ for (tp in 1:Time) {
 	 }
 	 datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
 		
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN2$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN2$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
 	 colnames(data) =  c(60:87)
 	 datamat = matrix(0, 1000,28)
 	 colnames(datamat) = c(60:87)
@@ -583,7 +592,7 @@ for (tp in 1:Time) {
 	}
 	 datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
 	
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
 	 colnames(data) =  c(60:87)
 	 datamat = matrix(0, 1000, 28)
 	 colnames(datamat) =c(60:87)
@@ -627,7 +636,7 @@ for (tp in 1:Time) {
 	Y[tp, which(avail1[tp, ]==0), ] = 0
 	Y[tp, , which(avail1[tp, ]==0)] = 0
 	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-	data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
+	data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
 	colnames(data) =  c(45:69)
 	datamat = matrix(0, 1000, 25)
 	colnames(datamat) = c(45:69)
@@ -636,7 +645,7 @@ for (tp in 1:Time) {
 	}
 	datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
 
-	data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
 	colnames(data) =  c(45:69)
 	datamat = matrix(0, 1000, 25)
 	colnames(datamat) = c(45:69)
@@ -645,7 +654,7 @@ for (tp in 1:Time) {
 	}
 	datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
 		
-	data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/N), 77)}))[,-c(1:44, 70:77)]
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
 	colnames(data) = c(45:69)
 	datamat = matrix(0, 1000, 25)
 	colnames(datamat) = c(45:69)
@@ -654,7 +663,7 @@ for (tp in 1:Time) {
 	}
 	datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
 	
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]), 77)}))[,-c(1:44, 70:77)]
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
  colnames(data) =  c(45:69)
 	datamat = matrix(0, 1000, 25)
 	colnames(datamat) =c(45:69)
@@ -664,7 +673,7 @@ for (tp in 1:Time) {
 	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
 	datamat4 = datamat3
 	datamat4 = as.data.frame(datamat4)
-	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/N)), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]
+	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/(N))), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]
 	names(observedpp) = c(45:69)
 	pvec = rep(0,25)
 	names(pvec) =c(45:69)
@@ -700,7 +709,7 @@ for (tp in 1:Time) {
     Y[tp, which(avail1[tp, ]==0), ] = 0
     Y[tp, , which(avail1[tp, ]==0)] = 0
     Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-    data = t(sapply(1:1000, function(r){tabulate(round(UN$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
+    data = t(sapply(1:1000, function(r){tabulate(round(UN$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
     colnames(data) = c(32:58)
     datamat = matrix(0, 1000, 27)
     colnames(datamat) = c(32:58)
@@ -709,7 +718,7 @@ for (tp in 1:Time) {
     }
     datamat1 = data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
     
-    data =  t(sapply(1:1000, function(r){tabulate(round(UN4$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
+    data =  t(sapply(1:1000, function(r){tabulate(round(UN4$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
     colnames(data) =  c(32:58)
     datamat = matrix(0, 1000, 27)
     colnames(datamat) = c(32:58)
@@ -718,7 +727,7 @@ for (tp in 1:Time) {
     }
     datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
     
-    data =  t(sapply(1:1000, function(r){tabulate(round(UN2$thirdDegree[[tp]][r,]/(N*N)), 66)}))[,-c(1:31, 59:66)]
+    data =  t(sapply(1:1000, function(r){tabulate(round(UN2$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
     colnames(data) = c(32:58)
     datamat = matrix(0, 1000, 27)
     colnames(datamat) = c(32:58)
@@ -727,7 +736,7 @@ for (tp in 1:Time) {
     }
     datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
     
-     data =  t(sapply(1:1000, function(r){tabulate(round(UN3$thirdDegree[[tp]][r,]), 66)}))[,-c(1:31, 59:66)]
+     data =  t(sapply(1:1000, function(r){tabulate(round(UN3$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
     colnames(data) =  c(32:58)
     datamat = matrix(0, 1000, 27)
      colnames(datamat) =c(32:58)
@@ -864,4 +873,4 @@ for (i in 1:32) {
 }
 
 gelman.diag = list(beta = output, theta = output2, tau = output3, kappa = output4, D = output5, U1 = output6, U2 = output7)
-save(gelman.diag, file = "gelmandiag.RData")
+save(gelman.diag, file = "/Users/bomin8319/Desktop/gelmandiag.RData")

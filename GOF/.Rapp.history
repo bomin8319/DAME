@@ -1,0 +1,2046 @@
+plot(c(UNdatafull$X[,,,4]),c(UNdatafull$Y))
+cormat = matrix(Exponential(dist_ij, 28420), Time, Time, byrow = TRUE)#
+#cormat#
+covmat = 0.1952 * cormat#
+#covmat#
+#
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ] *100}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 3#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+ovmat + diag(XX, Time, Time)/s2
+covmat + diag(XX, Time, Time)/s2
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ] *100}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 3#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+E = lapply(1:Time, function(tp) {Y[tp, , ]}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 3#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 1#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 2#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 3#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 4#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+dimnames(X)[[4]]
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 6#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 2#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+for (j in 2:6) {#
+x1 = c()#
+for (i in 1:32) {#
+	x1_raw = UNdatafull$X[i,,,j]#
+	x1 = c(x1, x1_raw[lower.tri(x1_raw)])#
+}#
+print(dimnames(UNdatafull$X)[[4]][j])#
+print(summary(x1))#
+}
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]*100}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 2#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.001268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+cormat = matrix(Exponential(dist_ij, 28420), Time, Time, byrow = TRUE)#
+#cormat#
+covmat = 0.1952 * cormat#
+#covmat#
+#
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]*100}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 2#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 0.1268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+#distance#
+cormat = matrix(Exponential(dist_ij, 28420), Time, Time, byrow = TRUE)#
+#cormat#
+covmat = 0.1952 * cormat#
+#covmat#
+#
+#posterior for distance#
+E = lapply(1:Time, function(tp) {Y[tp, , ]*100}) #assuming no theta and UDU#
+beta = t(sapply(1:Time, function(tp) colMeans(UN$BETA[[tp]])))#
+uppertri = upper.tri(diag(97))#
+E_p = c()#
+p = 2#
+for (tp in 1:Time) {#
+	XB_p = Reduce('+', lapply((1:6)[-p], function(k) {#
+                    X[tp, , , k] * beta[tp, k]#
+                }))#
+	E_p[tp] = sum((E[[tp]] - XB_p)[uppertri] * X[tp, , , p][uppertri], na.rm = TRUE)#
+} #
+E_p               #
+s2 = 1.268036#
+XX = sapply(1:Time, function(tp) sum(X[tp, , , p][uppertri]^2, na.rm = TRUE))#
+covmat_inv =  rcppeigen_invert_matrix(covmat + diag(XX, Time, Time)/s2)#
+mean_new = E_p/s2  #
+covmat_inv %*% mean_new#
+rmvnorm(1, covmat_inv %*% mean_new, covmat_inv)
+covmat
+covmat + diag(XX, Time, Time)/s2
+source('~/Desktop/DAME_revised/DAME_pkg_revised/R/DAME.R', chdir = TRUE)
+load('~/Desktop/DAME_revised/UNdatafull.RData')
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97#
+#
+# not existing countries -> all missing values imputed using model (biased)#
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)#
+#Degrees_nofixed = vapply(1:Time, function(tp) {rowSums(E[[tp]], na.rm = TRUE)}, rep(0, N))#
+#corr_nofixed = vapply(1:31, function(l) {cor(Degrees_nofixed[1:(N*(Time - l))], Degrees_nofixed[(1 + N*l):(N*Time)], use = "complete")}, 0)
+load('~/Desktop/DAME_research/UN_full_long.RData')
+names(UN)
+UN$YPM
+UN3_new = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
+UN3_new = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 20, nscan = 500, odens = 1)
+names(UN3_new)
+plot(UN3_new$s2, type = 'l')
+UN3_new$BETA
+###rerun#
+UN3_new = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)#
+save(UN3_new, file = "/Users/bomin8319/Desktop/UN_full3_new.RData")
+plot(UN3_new$s2, type = 'l')
+plot(UN3_new$tau[,1], type = 'l')
+plot(UN3_new$tau[,2], type = 'l')
+plot(UN3_new$tau[,3], type = 'l')
+plot(UN3_new$tau[,4], type = 'l')
+plot(UN3_new$tau[,5], type = 'l')
+plot(UN3_new$tau[,6], type = 'l')
+plot(UN3_new$kappas[,6], type = 'l')
+plot(UN3_new$kappas[,5], type = 'l')
+plot(UN3_new$kappas[,4], type = 'l')
+plot(UN3_new$kappas[,3], type = 'l')
+plot(UN3_new$kappas[,2], type = 'l')
+plot(UN3_new$kappas[,1], type = 'l')
+names(X)
+dimnames(X)
+names(UN3_new)
+summary(mcmc(UN3_new$s2))
+summary(mcmc(UN3_new$tau))
+head(UN3_new$tau)
+plot(UN3_new$tau[,3])
+plot(UN3_new$tau[,1])
+summary(mcmc(UN3_new$kappas))
+summary(mcmc(UN3_new$kappas))[[2]]
+summary(mcmc(UN3_new$kappas))[[2]][,3]
+round(summary(mcmc(UN3_new$kappas))[[2]][,3],4)
+plot(UN3_new$kappas[,6])
+plot(UN3_new$BETA[[1]][,1])
+plot(UN3_new$BETA[[1]][,2])
+plot(UN3_new$BETA[[1]][,3])
+plot(UN3_new$BETA[[1]][,4])
+plot(UN3_new$BETA[[1]][,5])
+plot(UN3_new$BETA[[1]][,6])
+summary(mcmc(UN3_new$BETA[[1]]))[[2]]
+summary(mcmc(UN3_new$BETA[[10]]))[[2]]
+lapply(1:32, function(x) summary(mcmc(UN3_new$BETA[[x]]))[[2]][,3])
+sapply(1:32, function(x) summary(mcmc(UN3_new$BETA[[x]]))[[2]][,3])
+names(UN3)
+load('~/Desktop/DAME_research/UN_full3.RData')
+round(summary(mcmc(UN3$kappas))[[2]][,3],4)
+summary(mcmc(UN3$kappas))[[2]]
+summary(mcmc(UN3$tau))[[2]]
+summary(mcmc(UN3$tau))[[2]][,3]
+summary(mcmc(UN3_new$BETA[[10]]))[[2]][,3]
+summary(mcmc(UN3$BETA[[10]]))[[2]][,3]
+sapply(1:32, function(x) summary(mcmc(UN3_new$BETA[[x]]))[[2]][,3])
+sapply(1:32, function(x) summary(mcmc(UN3$BETA[[x]]))[[2]][,3])
+summary(mcmc(UN3$s2))
+sapply(1:32, function(x) summary(mcmc(UN3$BETA[[x]]))[[2]][,3])
+sapply(1:32, function(x) summary(mcmc(UN3_new$BETA[[x]]))[[2]][,3])
+source('~/Desktop/DAME.R', chdir = TRUE)
+load('~/Desktop/DAME_revised/UNdatafull.RData')
+summary(c(Y))
+attach(UNdatafull)#
+library(FastGP)#
+library(mvtnorm)#
+library(fields)#
+library(reshape)#
+library(MCMCpack)#
+library(expm)#
+library(igraph)#
+library(coda)#
+library(ggplot2)#
+library(LaplacesDemon)#
+library(truncnorm)#
+library(gridExtra)#
+library(Rfast)#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+number_ticks <- function(n) {function(limits) pretty(limits, n)}#
+#
+# 97 country version#
+Time = 32#
+N = 97
+summary(c(Y))
+avail1 = matrix(1, Time, N)#
+colnames(avail1) = colnames(UNdatafull$Y)#
+avail1[1:8, which(colnames(avail1) %in% c("ROK", "PRK"))] = 0 #North and South Korea did not joined UN voting until 1990#
+avail1[1:9, which(colnames(avail1) %in% c("RUS"))] = 0 #RUS X variables not existed until 1991#
+avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction#
+#
+Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))#
+corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
+DAME_UU_fixed_revised
+UN7 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 200, nscan = 500, odens = 5)
+UN7 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 200, nscan = 500, odens = 5)
+plot(UN7$s2, type = 'l')
+UN6 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 200, nscan = 500, odens = 5)
+plot(UN7$s2, type = 'l')
+plot(UN6$s2, type = 'l')
+UN5 = DAME_UU_fixed_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 200, nscan = 500, odens = 5, kappas = rep(30, 6+1+2))
+plot(UN5$s2, type = 'l')
+UN5 = DAME_UU_fixed_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(10, 6+1+2))
+summary(UN5$s2, type = 'l')
+UN5 = DAME_UU_fixed_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(10, 6+1+2))
+names(UN5)
+plot(UN5$s2, type = 'l')
+save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
+save(UN5, file = "/Users/bomin8319/Desktop/UN_full5_final.RData")
+plot(UN5$tau[,1], type = 'l')
+plot(UN5$tau[,6], type = 'l')
+plot(UN5$tau[,7], type = 'l')
+plot(UN5$tau[,8], type = 'l')
+plot(UN5$tau[,9], type = 'l')
+load('~/Desktop/UN_full_long.RData')
+load('~/Desktop/UN_full2.RData')#
+load('~/Desktop/UN_full3.RData')
+UN4 = UN5
+#########summary of results########
+## side by side plot#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+#
+n2 = 1#
+for	(n in 1:N){#
+	print(n)#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0	#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$Degree[[d]][,n2]/ rowSums(UN$Degree[[d]]), rep(hi[d], length(UN$Degree[[d]][,n2])), rep("DAME", length(UN$Degree[[d]][,n2]))))#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,], na.rm=TRUE)[n2] / sum(Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("Degree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$Degree[[d]][,n2]/ rowSums(UN2$Degree[[d]]), rep(hi[d], length(UN2$Degree[[d]][,n2])), rep("AE", length(UN2$Degree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("Degree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$Degree[[d]][,n2]/rowSums(UN3$Degree[[d]]), rep(hi[d], length(UN3$Degree[[d]][,n2])), rep("NO", length(UN3$Degree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("Degree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$Degree[[d]][,n2]/ rowSums(UN4$Degree[[d]]), rep(hi[d], length(UN4$Degree[[d]][,n2])), rep("ME", length(UN4$Degree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("Degree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("Degree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))
+######degree statistics#
+setwd('/Users/bomin8319/Desktop/model_validation_new')#
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1#
+for (n in 1:N){#
+	hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))#
+	mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, ".png")#
+print(p10[[n]])#
+ggsave(filename = mname, width = 12, height = 6)#
+}#
+#
+#seconddegree#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+countrynames = sort(rownames(UN$U[[Time]]))#
+#
+n2 = 1#
+for 	(n in 1:N){#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$secondDegree[[d]][,n2]/rowSums(UN$secondDegree[[d]]), rep(hi[d], length(UN$secondDegree[[d]][,n2])), rep("DAME", length(UN$secondDegree[[d]][,n2]))))#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2]/ sum(Y[d,,] %*% Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("SecondDegree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$secondDegree[[d]][,n2]/rowSums(UN2$secondDegree[[d]]), rep(hi[d], length(UN2$secondDegree[[d]][,n2])), rep("AE", length(UN2$secondDegree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("SecondDegree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$secondDegree[[d]][,n2]/rowSums(UN3$secondDegree[[d]]), rep(hi[d], length(UN3$secondDegree[[d]][,n2])), rep("NO", length(UN3$secondDegree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("SecondDegree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$secondDegree[[d]][,n2]/rowSums(UN4$secondDegree[[d]]), rep(hi[d], length(UN4$secondDegree[[d]][,n2])), rep("ME", length(UN4$secondDegree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("SecondDegree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]],hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("SecondDegree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1#
+for (n in 1:N){#
+	hellonew[[n]]$SecondDegree = as.numeric(as.character(hellonew[[n]]$SecondDegree))#
+	mean[[n]]$SecondDegree = as.numeric(as.character(mean[[n]]$SecondDegree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = SecondDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, "second.png")#
+print(p10[[n]])#
+ggsave(filename = mname, width = 12, height = 6)#
+}#
+#thirddegree#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+countrynames = sort(rownames(UN$U[[Time]]))#
+#
+n2 = 1#
+for 	(n in 1:N){#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$thirdDegree[[d]][,n2]/rowSums(UN$thirdDegree[[d]]), rep(hi[d], length(UN$thirdDegree[[d]][,n2])), rep("DAME", length(UN$thirdDegree[[d]][,n2]))))#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2]/sum(Y[d,,] %*% Y[d,,] %*% Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$thirdDegree[[d]][,n2]/rowSums(UN2$thirdDegree[[d]]), rep(hi[d], length(UN2$thirdDegree[[d]][,n2])), rep("AE", length(UN2$thirdDegree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$thirdDegree[[d]][,n2]/rowSums(UN3$thirdDegree[[d]]), rep(hi[d], length(UN3$thirdDegree[[d]][,n2])), rep("NO", length(UN3$thirdDegree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$thirdDegree[[d]][,n2]/rowSums(UN4$thirdDegree[[d]]), rep(hi[d], length(UN4$thirdDegree[[d]][,n2])), rep("ME", length(UN4$thirdDegree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("ThirdDegree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("ThirdDegree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))#
+ggplotColours <- function(n = 6, h = c(0, 360) + 15){#
+  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n#
+  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)#
+}#
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1#
+for (n in 1:N){#
+	hellonew[[n]]$ThirdDegree = as.numeric(as.character(hellonew[[n]]$ThirdDegree))#
+	mean[[n]]$ThirdDegree = as.numeric(as.character(mean[[n]]$ThirdDegree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = ThirdDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) +  geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, "third.png")#
+print(p10[[n]])#
+ggsave(filename = mname, width = 12, height = 6)#
+}
+names(UN)
+plot(UN$tau[,7], type = 'l')
+plot(UN$tau[,8], type = 'l')
+plot(UN$tau[,9], type = 'l')
+plot(UN$kappas[,9], type = 'l')
+plot(UN$kappas[,8], type = 'l')
+plot(UN$kappas[,7], type = 'l')
+dim(UN$BETA[[1]])
+#beta#
+beta = lapply(1:Time, function(t){summary(mcmc(UN$BETA[[t]][1:2000,]))[[2]]})#
+betas = list()#
+for (i in 1:6) {betas[[i]] = sapply(1:Time, function(t){beta[[t]][i,]})}#
+betacols= ggplotColours(6)#
+plots = list()#
+i= 1#
+years = c(1983:2014)#
+data = data.frame(cbind(years,t(betas[[i]])))#
+ colnames(data)[4] = "beta"#
+ f = ggplot(data, aes(x = years))#
+plots[[1]]=f + geom_line(aes(y = beta), colour=betacols[1]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + scale_x_continuous(breaks=number_ticks(8))+ylab("Intercept") + theme_minimal()#
+#
+color =betacols[-1]#
+varname = c("log(distance)", "Polity", "Alliance", "Lower trade-to-GDP ratio", "Common Language")#
+for (i in 2:6){#
+years = c(1983:2014)#
+data = data.frame(cbind(years,t(betas[[i]])))#
+ colnames(data)[4] = "beta"#
+ f = ggplot(data, aes(x = years))#
+ plots[[i]] <- f + geom_line(aes(y = beta), colour=color[i-1]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + ylab(varname[i-1]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()#
+#
+ }#
+ marrangeGrob(plots[1:6], nrow = 2, ncol = 3, top = NULL)
+#D plots UPDATED#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail1[tp,]==0)#
+  })#
+Dout = matrix(NA, nrow = 32, ncol = 0)#
+Dnew = UN$DPS#
+for (i in 1:2000) {#
+		UDUPM = list()#
+		for (t in 1:32) {#
+			U = UN$UPS[[t]][,c(2*i-1, i*2)]#
+			UDUPM[[t]] = U %*% diag(UN$DPS[[t]][i,]) %*% t(U)#
+		}#
+		 eULU = lapply(1:Time, function(tp) {#
+    	exclude = meaningful_NA_rows[[tp]]#
+    	if (length(exclude) > 0) {#
+     	 eigentp = eigen(UDUPM[[tp]][-exclude, -exclude])#
+    	} else {#
+      	eigentp = eigen(UDUPM[[tp]])#
+    	}#
+    	eigentp#
+  		})#
+  		eR = lapply(1:Time, function(tp) {#
+    	which(rank(-abs(eULU[[tp]]$val), ties.method = "first") <= 2)#
+  		})#
+ 	 	L =  lapply(1:Time, function(tp){#
+    	eULU[[tp]]$val[eR[[tp]]]#
+  		})#
+  		for (t in 1:32) {#
+  			Dnew[[t]][i,] = L[[t]]#
+  		}#
+}	#
+D = lapply(1:Time, function(t){summary(mcmc(Dnew[[t]]))[[2]]})#
+Ds = list()#
+for (i in 1:2) {Ds[[i]] = sapply(1:Time, function(t){D[[t]][i,]})}#
+betacols= ggplotColours(2)#
+plots = list()#
+years = c(1983:2014)#
+data = data.frame(cbind(years,t(Ds[[i]])))#
+ colnames(data)[4] = "D"#
+ f = ggplot(data, aes(x = years))#
+varname = c("D_1", "D_2")#
+for (i in 1:2){#
+years = c(1983:2014)#
+data = data.frame(cbind(years,t(Ds[[i]])))#
+ colnames(data)[4] = "D"#
+ f = ggplot(data, aes(x = years))#
+ plots[[i]] <- f + geom_line(aes(y = D), colour=color[i]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + ylab(varname[i]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()#
+Dout = cbind(Dout, data)#
+ }#
+ marrangeGrob(plots[1:2], nrow = 1, ncol = 2, top = NULL)
+names(UN)
+UN$D
+names(UN5)
+#thetaplot#
+colors = sort(rownames(UN$U[[Time]]))#
+colors[which(colors == "GFR")] = "GMY"#
+rownames(UN$U[[Time]])[31] = "GMY"#
+	thetanew = t(sapply(1:Time, function(t){colMeans(UN$theta[[t]])}))#
+	colnames(thetanew) = colnames(avail1)#
+	orders = sapply(1:N, function(n){which(colors[n]== rownames(UN$U[[Time]]))})#
+	thetanew = thetanew[,orders]#
+	data3 = data.frame(years = years, theta = thetanew)#
+	colnames(data3)[-1] = colors#
+	data3new = melt(data3, id = "years")#
+	colnames(data3new)[3] = "theta"#
+	f <- ggplot(data3new, aes(years, theta, colour = variable, label = variable))#
+	f + geom_line(size = 0.2)+#
+geom_text(data = data3new[data3new$years=="1983", ], aes(label = variable), check_overlap = F, hjust = 1.3, vjust = 1, size =3, show.legend = F )+#
+geom_text(data = data3new[data3new$years=="2014", ], aes(label = variable), check_overlap = F, hjust = -0.3, vjust = 1, size =3, show.legend = F )+ scale_x_continuous(breaks=number_ticks(8)) + scale_colour_discrete(name = "countries") + theme_minimal()#
+#thetaplot_reduced#
+ggcolors = ggplotColours(21)#
+colors = sort(rownames(UN$U[[Time]])[which(rownames(UN$U[[Time]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"))])#
+data4new = data3new[data3new$variable %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]#
+#
+f <- ggplot(data4new, aes(years, theta, color = variable, label = variable))#
+f + geom_line(size = 0.5, aes(linetype =as.factor(c(sapply(c(6:1,5:1,5:1,5:1), function(x){rep(x, Time)})))))+geom_point(size =1, aes(shape =as.factor(c(sapply(c(1:6,1:5,1:5,1:5), function(x){rep(x, Time)})))))+ scale_x_continuous(breaks=number_ticks(8)) + theme_minimal() + #
+  geom_text(data = data4new[data4new$years=="1983", ], aes(label = variable), check_overlap = T, hjust = 1.3, vjust = 1, size =3, show.legend = F )+#
+geom_text(data = data4new[data4new$years=="2014", ], aes(label = variable), check_overlap = T, hjust = -0.3, vjust = 1, size =3, show.legend = F )+#
+  scale_color_manual(values = ggplotColours(21), name = "countries")+scale_linetype(guide = FALSE)+scale_shape(guide = FALSE)+#
+  guides(colour = guide_legend(override.aes = list(shape = c(1:6,1:5,1:5,1:5), linetype = c(6:1,5:1,5:1,5:1)))) #
+#
+f <- ggplot(data4new, aes(years, theta, color = variable, label = variable))#
+f + geom_line( aes(linetype =as.factor(c(sapply(c(6:1,5:1,5:1,5:1), function(x){rep(x, Time)})))))+ scale_x_continuous(breaks=number_ticks(8)) + theme_minimal() + #
+  geom_text(data = data4new[data4new$years=="1983", ], aes(label = variable), check_overlap = F, hjust = 1.3, vjust = 1, size =3, show.legend = F )+#
+  geom_text(data = data4new[data4new$years=="1988", ], aes(label = variable), check_overlap = F, hjust = 0, vjust = 1.2, size =3, show.legend = F )+#
+  geom_text(data = data4new[data4new$years=="2009", ], aes(label = variable), check_overlap = F, hjust = 0, vjust = 1.2, size =3, show.legend = F )+#
+  geom_text(data = data4new[data4new$years=="2014", ], aes(label = variable), check_overlap = F, hjust = -0.3, vjust = 1, size =3, show.legend = F )+#
+  scale_color_manual(values = ggplotColours(21), name = "countries")+scale_linetype(guide = FALSE)+scale_shape(guide = FALSE)+#
+  guides(colour = guide_legend(override.aes = list(linetype = c(6:1,5:1,5:1,5:1))))
+#UD plots_full#
+setwd('/Users/bomin8319/Desktop/UDU')#
+years = c(1983:2014)#
+#
+Xstar = matrix(0, nrow = N, ncol = 2)#
+rownames(Xstar) = sort(rownames(UN$U[[Time]]))#
+rownames(Xstar)[which(rownames(Xstar) == "GFR")] = "GMY"#
+Xstar[94, ]= c(0,1)#
+Xstar[48, ] = c(1,0)#
+#Xstar[19, ] = c(0, -1)#
+##Xstar[20, ] = c(0.5, 0.5)#
+#Xstar[11, ] = c(1, 0)#
+#Xstar[16,] =c(0.5, 1)#
+plots= list()#
+data2 = list()#
+colors = sort(rownames(Xstar))#
+for (t in 1:Time) {#
+UDmat = matrix(NA, N, 2)#
+rownames(UDmat) = colors#
+rownames(UN$U[[t]])[which(rownames(UN$U[[t]]) == "GFR")] = "GMY"#
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * UN$D[[t]][1] #
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * UN$D[[t]][2]#
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),] = procrustes(UDmat[which(rownames(UDmat) %in% rownames(UN$U[[t]])),], Xstar[which(rownames(Xstar) %in% rownames(UN$U[[t]])),])$X.new#
+#UDmat = UDmat - UDmat[which(rownames(UDmat) =="USA"),]#
+data2[[t]] = data.frame(UDmat)#
+colnames(data2[[t]])[1:2] = c("r1", "r2")#
+Xstar = UDmat#
+Xstar[is.na(Xstar)] = rep(0, 2)#
+}#
+#rangex = summary(unlist(sapply(1:Time, function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))#
+#rangey = summary(unlist(sapply(1:Time, function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))#
+#
+for (t in 1:Time) {#
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]#
+p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))#
+#
+plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))#
+mname = paste0("plot", t, "full.png")#
+print(plots[[t]])#
+ggsave(filename = mname)#
+}#
+#
+#rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))#
+#rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))#
+for (t in c(4,8,12,16,20,24,28,Time)) {#
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]#
+p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")#
+plots[[t]] = p+ geom_text(size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))#
+}#
+marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)#
+#
+#UD plots_reduced#
+data3 = list()#
+for (t in 1:Time) {#
+    data3[[t]] = data2[[t]][rownames(data2[[t]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]#
+}#
+plots= list()#
+colors = sort(rownames(data3[[1]]))#
+for (t in 1:Time) {#
+    colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]#
+    p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]])))#
+    plots[[t]] = p+ geom_text(size = 5, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))#
+    mname = paste0("plot", t, "reduced.png")#
+    print(plots[[t]])#
+   ggsave(filename = mname)#
+}
+UN$D
+for (t in c(4,8,12,16,20,24,28,Time)) {#
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]#
+p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")#
+#
+plots[[t]] = p+ geom_text(size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))#
+}#
+marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+##Posterior predictive of degree#
+setwd('/Users/bomin8319/Desktop/external')#
+ggcolors = ggplotColours(3)#
+datacollapse = matrix(0, nrow = 84000, ncol = 3)#
+observedcollapse = matrix(0, 28, 3)#
+pp = list()#
+for (tp in 1:Time) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  60:87#
+	datamat = matrix(0, 1000, 28)#
+	colnames(datamat) = c(60:87)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))#
+#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN4$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  c(60:87)#
+	datamat = matrix(0, 1000, 28)#
+	 colnames(datamat) = c(60:87)#
+	 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	 }#
+	 datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("ME")))#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN2$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]#
+	 colnames(data) =  c(60:87)#
+	 datamat = matrix(0, 1000,28)#
+	 colnames(datamat) = c(60:87)#
+		 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	 datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("AE")))#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]#
+	 colnames(data) =  c(60:87)#
+	 datamat = matrix(0, 1000, 28)#
+	 colnames(datamat) =c(60:87)#
+		 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("NO")))#
+	datamat4 = datamat3#
+	datamat4 = as.data.frame(datamat4)#
+	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,])), 95) / sum(tabulate(round(rowSums(Y[tp,,])), 95)))[-c(1:59, 88:95)]#
+	names(observedpp) = c(60:87)#
+	pvec = rep(0, 28)#
+	names(pvec) =c(60:87)#
+	pvec[which(names(pvec) %in% names(observedpp))] = observedpp#
+	observed = data.frame(Proportion = pvec, Degree = as.factor(c(60:87)), Model = "DAME")#
+	pp[[tp]] = ggplot(datamat4, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+    datacollapse[,1] = datacollapse[,1] + datamat3[,1]#
+    observedcollapse[,1] = observedcollapse[,1] + observed[,1]#
+}#
+years = c(1983:2014)#
+for (t in 1:Time){#
+mname = paste0(years[t], "overalldegree", ".png")#
+print(pp[[t]])#
+ggsave(filename = mname, width = 10, height = 6)#
+}#
+datacollapse = data.frame(Proportion = datacollapse[,1]/Time, Degree = datamat3$Degree, Model = datamat3$Model)#
+observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, Degree = observed$Degree, Model = observed$Model)#
+datacollapse2 = datacollapse[datacollapse$Model == "DAME",]#
+pp = ggplot(datacollapse, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#pp = ggplot(datacollapse2, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+pp
+tp = 1
+setwd('/Users/bomin8319/Desktop/external')#
+ggcolors = ggplotColours(3)#
+datacollapse = matrix(0, nrow = 84000, ncol = 3)#
+observedcollapse = matrix(0, 28, 3)#
+pp = list()
+diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  60:87#
+	datamat = matrix(0, 1000, 28)#
+	colnames(datamat) = c(60:87)
+head(data)
+for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}
+head(datamat)
+colnames(datamat) = c(60:87)*100
+datamat = matrix(0, 1000, 28)#
+	colnames(datamat) = c(60:87)*100#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}
+colnames(datamat) = c(60:87)*100
+head(datamat)
+diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  c(60:87)*100#
+	datamat = matrix(0, 1000, 28)#
+	colnames(datamat) = c(60:87)*100#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}
+head(datamat)
+data[i,]
+tabulate(round(UN$Degree[[tp]][r,]), 95)
+tabulate(round(UN$Degree[[tp]][1,]), 95)
+tabulate(round(UN$Degree[[tp]][r,])
+)
+tabulate(round(UN$Degree[[tp]][1,]))
+data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]/10000), 95)}))[,-c(1:59, 88:95)]
+diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]/10000), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  c(60:87)#
+	datamat = matrix(0, 1000, 28)#
+	colnames(datamat) = c(60:87)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
+head(datamat1)
+head(datamat)
+head(UN$Degree[[1]])
+diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  c(60:87)#
+	datamat = matrix(0, 1000, 28)#
+	colnames(datamat) = c(60:87)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
+head(datamat1)
+setwd('/Users/bomin8319/Desktop/external')#
+ggcolors = ggplotColours(3)#
+datacollapse = matrix(0, nrow = 84000, ncol = 3)#
+observedcollapse = matrix(0, 28, 3)#
+pp = list()#
+for (tp in 1:Time) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  c(60:87)#
+	datamat = matrix(0, 1000, 28)#
+	colnames(datamat) = c(60:87)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))#
+#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN4$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]#
+	colnames(data) =  c(60:87)#
+	datamat = matrix(0, 1000, 28)#
+	 colnames(datamat) = c(60:87)#
+	 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	 }#
+	 datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("ME")))#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN2$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]#
+	 colnames(data) =  c(60:87)#
+	 datamat = matrix(0, 1000,28)#
+	 colnames(datamat) = c(60:87)#
+		 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	 datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("AE")))#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]#
+	 colnames(data) =  c(60:87)#
+	 datamat = matrix(0, 1000, 28)#
+	 colnames(datamat) =c(60:87)#
+		 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("NO")))#
+	datamat4 = datamat3#
+	datamat4 = as.data.frame(datamat4)#
+	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,])), 95) / sum(tabulate(round(rowSums(Y[tp,,])), 95)))[-c(1:59, 88:95)]#
+	names(observedpp) = c(60:87)#
+	pvec = rep(0, 28)#
+	names(pvec) =c(60:87)#
+	pvec[which(names(pvec) %in% names(observedpp))] = observedpp#
+	observed = data.frame(Proportion = pvec, Degree = as.factor(c(60:87)), Model = "DAME")#
+	pp[[tp]] = ggplot(datamat4, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+    datacollapse[,1] = datacollapse[,1] + datamat3[,1]#
+    observedcollapse[,1] = observedcollapse[,1] + observed[,1]#
+}#
+years = c(1983:2014)#
+for (t in 1:Time){#
+mname = paste0(years[t], "overalldegree", ".png")#
+print(pp[[t]])#
+ggsave(filename = mname, width = 10, height = 6)#
+}#
+datacollapse = data.frame(Proportion = datacollapse[,1]/Time, Degree = datamat3$Degree, Model = datamat3$Model)#
+observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, Degree = observed$Degree, Model = observed$Model)#
+datacollapse2 = datacollapse[datacollapse$Model == "DAME",]#
+pp = ggplot(datacollapse, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#pp = ggplot(datacollapse2, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+pp
+#seconddegree#
+ggcolors = ggplotColours(3)#
+datacollapse = matrix(0, nrow = 2*37500, ncol = 3)#
+observedcollapse = matrix(0, 25, 3)#
+pp = list()#
+for (tp in 1:Time) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+	data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))#
+#
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("ME")))#
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) = c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+		for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("AE")))#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+ colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) =c(45:69)#
+		 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("NO")))#
+	datamat4 = datamat3#
+	datamat4 = as.data.frame(datamat4)#
+	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/(N*100))), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]#
+	names(observedpp) = c(45:69)#
+	pvec = rep(0,25)#
+	names(pvec) =c(45:69)#
+	pvec[which(names(pvec) %in% names(observedpp))] = observedpp#
+	observed = data.frame(Proportion = pvec, secondDegree = as.factor(c(45:69)), Model = "DAME")#
+	pp[[tp]] = ggplot(datamat4, aes(x = secondDegree, y = Proportion,fill = Model, color = Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+    datacollapse[,1] = datacollapse[,1] + datamat4[,1]#
+    observedcollapse[,1] = observedcollapse[,1] + observed[,1]#
+}
+#seconddegree#
+ggcolors = ggplotColours(3)#
+datacollapse = matrix(0, nrow = 2*37500, ncol = 3)#
+observedcollapse = matrix(0, 25, 3)#
+pp = list()#
+for (tp in 1:Time) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+	data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))#
+#
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("ME")))#
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) = c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+		for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("AE")))#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]/(N*100)), 77)}))[,-c(1:44, 70:77)]#
+ colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) =c(45:69)#
+		 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("NO")))#
+	datamat4 = datamat3#
+	datamat4 = as.data.frame(datamat4)#
+	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/(N))), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]#
+	names(observedpp) = c(45:69)#
+	pvec = rep(0,25)#
+	names(pvec) =c(45:69)#
+	pvec[which(names(pvec) %in% names(observedpp))] = observedpp#
+	observed = data.frame(Proportion = pvec, secondDegree = as.factor(c(45:69)), Model = "DAME")#
+	pp[[tp]] = ggplot(datamat4, aes(x = secondDegree, y = Proportion,fill = Model, color = Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+    datacollapse[,1] = datacollapse[,1] + datamat4[,1]#
+    observedcollapse[,1] = observedcollapse[,1] + observed[,1]#
+}
+for (t in 1:Time){#
+mname = paste0(years[t], "overallseconddegree", ".png")#
+print(pp[[t]])#
+ggsave(filename = mname, width = 10, height = 6)#
+}
+head(UN$secondDegree[[1]])
+#seconddegree#
+ggcolors = ggplotColours(3)#
+datacollapse = matrix(0, nrow = 2*37500, ncol = 3)#
+observedcollapse = matrix(0, 25, 3)#
+pp = list()#
+for (tp in 1:Time) {#
+	diag(Y[tp,,]) = 0#
+	Y[tp, which(avail1[tp, ]==0), ] = 0#
+	Y[tp, , which(avail1[tp, ]==0)] = 0#
+	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+	data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))#
+#
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+	for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("ME")))#
+	data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]#
+	colnames(data) = c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) = c(45:69)#
+		for (i in 1:1000) {#
+		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("AE")))#
+	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]#
+ colnames(data) =  c(45:69)#
+	datamat = matrix(0, 1000, 25)#
+	colnames(datamat) =c(45:69)#
+		 for (i in 1:1000) {#
+		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+	}#
+	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("NO")))#
+	datamat4 = datamat3#
+	datamat4 = as.data.frame(datamat4)#
+	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/(N))), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]#
+	names(observedpp) = c(45:69)#
+	pvec = rep(0,25)#
+	names(pvec) =c(45:69)#
+	pvec[which(names(pvec) %in% names(observedpp))] = observedpp#
+	observed = data.frame(Proportion = pvec, secondDegree = as.factor(c(45:69)), Model = "DAME")#
+	pp[[tp]] = ggplot(datamat4, aes(x = secondDegree, y = Proportion,fill = Model, color = Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+    datacollapse[,1] = datacollapse[,1] + datamat4[,1]#
+    observedcollapse[,1] = observedcollapse[,1] + observed[,1]#
+}#
+#
+for (t in 1:Time){#
+mname = paste0(years[t], "overallseconddegree", ".png")#
+print(pp[[t]])#
+ggsave(filename = mname, width = 10, height = 6)#
+}
+datacollapse = data.frame(Proportion = datacollapse[,1]/Time, secondDegree = datamat3$secondDegree, Model = datamat3$Model)#
+observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, secondDegree = observed$secondDegree, Model = observed$Model)#
+datacollapse2 = datacollapse[datacollapse$Model == "DAME",]#
+pp = ggplot(datacollapse, aes(x = secondDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#pp = ggplot(datacollapse2, aes(x = secondDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+pp
+#thirddegree#
+ggcolors = ggplotColours(3)#
+datacollapse = matrix(0, nrow = 2*40500, ncol = 3)#
+observedcollapse = matrix(0, 27, 3)#
+#
+pp = list()#
+for (tp in 1:Time) {#
+    diag(Y[tp,,]) = 0#
+    Y[tp, which(avail1[tp, ]==0), ] = 0#
+    Y[tp, , which(avail1[tp, ]==0)] = 0#
+    Y[tp, , ][which(is.na(Y[tp, , ]))] = 0#
+    data = t(sapply(1:1000, function(r){tabulate(round(UN$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]#
+    colnames(data) = c(32:58)#
+    datamat = matrix(0, 1000, 27)#
+    colnames(datamat) = c(32:58)#
+    for (i in 1:1000) {#
+        datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+    }#
+    datamat1 = data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))#
+    data =  t(sapply(1:1000, function(r){tabulate(round(UN4$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]#
+    colnames(data) =  c(32:58)#
+    datamat = matrix(0, 1000, 27)#
+    colnames(datamat) = c(32:58)#
+    for (i in 1:1000) {#
+        datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+    }#
+    datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("ME")))#
+    data =  t(sapply(1:1000, function(r){tabulate(round(UN2$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]#
+    colnames(data) = c(32:58)#
+    datamat = matrix(0, 1000, 27)#
+    colnames(datamat) = c(32:58)#
+    for (i in 1:1000) {#
+        datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+    }#
+    datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("AE")))#
+     data =  t(sapply(1:1000, function(r){tabulate(round(UN3$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]#
+    colnames(data) =  c(32:58)#
+    datamat = matrix(0, 1000, 27)#
+     colnames(datamat) =c(32:58)#
+     for (i in 1:1000) {#
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])#
+     }#
+    datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("NO")))#
+    datamat4 = datamat3#
+    datamat4 = as.data.frame(datamat4)#
+    observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]%*% Y[tp,,]/(N*N))), 66) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,]%*% Y[tp,,] /(N*N))), 66)))[-c(1:31, 59:66)]#
+    names(observedpp) = c(32:58)#
+    pvec = rep(0, 27)#
+    names(pvec) =c(32:58)#
+    pvec[which(names(pvec) %in% names(observedpp))] = observedpp#
+    observed = data.frame(Proportion = pvec, thirdDegree = as.factor(c(32:58)), Model = "DAME")#
+    pp[[tp]] = ggplot(datamat4, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+    datacollapse[,1] = datacollapse[,1] + datamat4[,1]#
+    observedcollapse[,1] = observedcollapse[,1] + observed[,1]#
+}#
+years = c(1983:2014)#
+for (t in 1:Time){#
+    mname = paste0(years[t], "overallthirddegree", ".png")#
+    print(pp[[t]])#
+    ggsave(filename = mname, width = 10, height = 6)#
+}
+datacollapse = data.frame(Proportion = datacollapse[,1]/Time, thirdDegree = datamat3$thirdDegree, Model = datamat3$Model)#
+observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, thirdDegree = observed$thirdDegree, Model = observed$Model)#
+pp = ggplot(datacollapse, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+datacollapse2 = datacollapse[datacollapse$Model == "DAME",]#
+#pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+pp
+#convergence check#
+library(coda)#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail1[tp,]==0)#
+  })#
+Dout = matrix(NA, nrow = 32, ncol = 0)#
+Dnew = UN$DPS#
+Unew = UN$UPS#
+for (i in 1:2000) {#
+		UDUPM = list()#
+		for (t in 1:32) {#
+			U = UN$UPS[[t]][,c(2*i-1, i*2)]#
+			UDUPM[[t]] = U %*% diag(UN$DPS[[t]][i,]) %*% t(U)#
+		}#
+		 eULU = lapply(1:Time, function(tp) {#
+    	exclude = meaningful_NA_rows[[tp]]#
+    	if (length(exclude) > 0) {#
+     	 eigentp = eigen(UDUPM[[tp]][-exclude, -exclude])#
+    	} else {#
+      	eigentp = eigen(UDUPM[[tp]])#
+    	}#
+    	eigentp#
+  		})#
+  		eR = lapply(1:Time, function(tp) {#
+    	which(rank(-abs(eULU[[tp]]$val), ties.method = "first") <= 2)#
+  		})#
+ 	 	L =  lapply(1:Time, function(tp){#
+    	eULU[[tp]]$val[eR[[tp]]]#
+  		})#
+  		eV =  lapply(1:Time, function(tp){#
+    	eULU[[tp]]$vec[,eR[[tp]]]#
+  		})#
+  		for (t in 1:32) {#
+  			Dnew[[t]][i,] = L[[t]]#
+  			if (length(meaningful_NA_rows[[t]]) > 0) {#
+  				exclude = meaningful_NA_rows[[t]]#
+  				Unew[[t]][-exclude,2*i] = eV[[t]][,2]	#
+  				Unew[[t]][-exclude,2*i-1] = eV[[t]][,1]			#
+  			} else {#
+  			Unew[[t]][,2*i] = eV[[t]][,2]	#
+  			Unew[[t]][,2*i-1] = eV[[t]][,1]			#
+  			}#
+  		}#
+}	#
+output = c()#
+for (i in 1:32) {#
+	for (j in 1:6) {#
+	s = gelman.diag(mcmc.list(mcmc(UN$BETA[[i]][1:1000,j]), mcmc(UN$BETA[[i]][1001:2000,j])))#
+	output = rbind(output, c(i, j, unlist(s)))#
+	}#
+}#
+#
+output2 = c()#
+for (i in 1:32) {#
+	for (j in 1:97) {#
+	s = gelman.diag(mcmc.list(mcmc(UN$theta[[i]][1:1000,j]), mcmc(UN$theta[[i]][1001:2000,j])))#
+	output2 = rbind(output2, c(i, j, unlist(s)))#
+	}#
+}#
+#
+output3 = c()#
+for (j in 1:9) {#
+	s = gelman.diag(mcmc.list(mcmc(UN$tau[1:1000, j]), mcmc(UN$tau[1001:2000,j])))#
+	output3 = rbind(output3, c(j, unlist(s)))#
+}#
+#
+output4 = c()#
+for (j in 1:9) {#
+	s = gelman.diag(mcmc.list(mcmc(UN$kappas[1:1000, j]), mcmc(UN$kappas[1001:2000,j])))#
+	output4 = rbind(output4, c(j, unlist(s)))#
+}#
+#
+output5 = c()#
+for (i in 1:32) {#
+	for (j in 1:2) {#
+		s = gelman.diag(mcmc.list(mcmc(Dnew[[i]][1:1000, j]), mcmc(Dnew[[i]][1001:2000,j])))#
+		output5 = rbind(output5, c(i, j, unlist(s)))#
+	}#
+}#
+#
+output6 = c()#
+for (i in 1:32) {#
+	for (j in 1:97) {#
+		s = gelman.diag(mcmc.list(mcmc(Unew[[i]][j, 2*(1:1000)-1]), mcmc(Unew[[i]][j, 2*(1001:2000)-1])))#
+		output6 = rbind(output6, c(i, j, unlist(s)))#
+	}#
+}#
+#
+output7 = c()#
+for (i in 1:32) {#
+	for (j in 1:97) {#
+		s = gelman.diag(mcmc.list(mcmc(Unew[[i]][j, 2*(1:1000)]), mcmc(Unew[[i]][j, 2*(1001:2000)])))#
+		output7 = rbind(output7, c(i, j, unlist(s)))#
+	}#
+}#
+#
+gelman.diag = list(beta = output, theta = output2, tau = output3, kappa = output4, D = output5, U1 = output6, U2 = output7)
+gelman.diag
+names(gelman.diag)
+head(gelman.diag$beta)
+sum(gelman.diag$beta[,1] >1.1)
+sum(gelman.diag$beta[,1] >1.1)/nrow(gelman.diag$beta)
+sum(gelman.diag$beta[,1] <1.1)/nrow(gelman.diag$beta)
+sum(gelman.diag$beta[,2] <1.1)/nrow(gelman.diag$beta)
+tail(gelman.diag$beta)
+sum(gelman.diag$beta[,3] <1.1)/nrow(gelman.diag$beta)
+sum(gelman.diag$beta[,4] <1.1)/nrow(gelman.diag$beta)
+head(gelman.diag$theta)
+sum(gelman.diag$theta[,4] <1.1)/nrow(gelman.diag$theta)
+sum(gelman.diag$theta[,4] <1.1)/nrow(gelman.diag$theta)
+sum(gelman.diag$theta[,4] <1.1, na.rm = TRUE)/nrow(gelman.diag$theta)
+sum(gelman.diag$theta[,3] <1.1, na.rm = TRUE)/nrow(gelman.diag$theta)
+?gelman.diag
+sum(gelman.diag$tau[,3] <1.1, na.rm = TRUE)/nrow(gelman.diag$tau)
+sum(gelman.diag$kappa[,3] <1.1, na.rm = TRUE)/nrow(gelman.diag$kappa)
+sum(gelman.diag$D[,3] <1.1, na.rm = TRUE)/nrow(gelman.diag$D)
+sum(gelman.diag$U1[,3] <1.1, na.rm = TRUE)/nrow(gelman.diag$U1)
+sum(gelman.diag$U2[,3] <1.1, na.rm = TRUE)/nrow(gelman.diag$U2)
+save(gelman.diag, file = "/Users/bomin8319/Desktop/gelmandiag.RData")
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+    Y[tp, , ][meaningful_NA[[tp]]] = 0#
+    	pureNA = which(rowSums(Y[tp,,], na.rm = TRUE)==0)#
+    	if (length(meaningful_NA_rows[[tp]]) > 0) {#
+    	pureNA = pureNA[-which(pureNA %in% meaningful_NA_rows[[tp]])]#
+    	}#
+    Y[tp, , ][is.na(Y[tp, , ])] = 0 #
+	if (tp < 10 | tp %in% 12:21) {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+avail = avail1#
+  colnames(avail) = dimnames(Y)[[2]]#
+  meaningful_NA_rows = lapply(1:Time, function(tp) {#
+    which(avail[tp,]==0)#
+  })#
+  meaningful_NA = lapply(1:Time, function(tp) {#
+    pre = matrix(0, N, N)#
+    pre[meaningful_NA_rows[[tp]],] = NA#
+    pre[,meaningful_NA_rows[[tp]]] = NA#
+    which(is.na(pre)==TRUE)#
+  })#
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+    Y[tp, , ][meaningful_NA[[tp]]] = 0#
+    	pureNA = which(rowSums(Y[tp,,], na.rm = TRUE)==0)#
+    	if (length(meaningful_NA_rows[[tp]]) > 0) {#
+    	pureNA = pureNA[-which(pureNA %in% meaningful_NA_rows[[tp]])]#
+    	}#
+    Y[tp, , ][is.na(Y[tp, , ])] = 0 #
+	if (tp < 10 | tp %in% 12:21) {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+setwd('/Users/bomin8319/Desktop/GOF')#
+for (tp in 1:32) {#
+	mname = paste0("Year", tp, ".png")#
+    png(filename = mname)#
+    diag(Y[tp,,]) = 0#
+    Y[tp, , ][meaningful_NA[[tp]]] = 0#
+    	pureNA = which(rowSums(Y[tp,,], na.rm = TRUE)==0)#
+    	if (length(meaningful_NA_rows[[tp]]) > 0) {#
+    	pureNA = pureNA[-which(pureNA %in% meaningful_NA_rows[[tp]])]#
+    	}#
+    Y[tp, , ][is.na(Y[tp, , ])] = 0 #
+    Y[tp, , ] = Y[tp, , ]*100#
+	if (tp < 10 | tp %in% 12:21) {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$Degree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA)), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)[-c(which(avail1[tp,]==0),pureNA)]/(sum(avail1[tp,])-length(pureNA))), col = "red")#
+	} else {#
+	par(mfrow = c(3,2))	#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment mean")#
+	abline(v = mean(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$Degree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "1st moment sd")#
+	abline(v = sd(rowSums(Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$secondDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "2nd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, mean), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment mean")#
+	abline(v = mean(rowSums(Y[tp,,] %*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	hist(apply(UN$thirdDegree[[tp]][,]/sum(avail1[tp,]), 1, sd), main = "", prob = FALSE, col = "lightblue", ylab = "", xlab = "3rd moment sd")#
+	abline(v = sd(rowSums(Y[tp,,]%*% Y[tp,,] %*% Y[tp,,], na.rm = TRUE)/sum(avail1[tp,])), col = "red")#
+	}#
+	dev.off()#
+}
+hey = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey = hey + sum((yhat[1001:2000]-y)^2)#
+	}#
+}#
+hey2 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "ME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey2 = hey2 + sum((yhat-y)^2)#
+	}#
+}#
+#
+hey3 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "AE",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey3 = hey3 + sum((yhat-y)^2)#
+	}#
+}#
+#
+hey4 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "NO",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey4 = hey4 + sum((yhat-y)^2)#
+	}#
+}
+hey
+hey2
+hey3
+hey4
+hey5
+head(hellonew[[1]])
+## side by side plot#
+hi = factor(1983:2014)#
+hello = list()#
+hello2 = list()#
+hello3 = list()#
+hello4 = list()#
+hellonew = list()#
+mean = list()#
+#
+n2 = 1#
+for	(n in 1:N){#
+	print(n)#
+	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	diag(Y[d,, ])= 0#
+	Y[d, which(avail1[d,]==0), ] = 0#
+	Y[d, , which(avail1[d,]==0)] = 0#
+	Y[d, , ][which(is.na(Y[d, , ]))] = 0	#
+	hello[[n]]  = rbind(hello[[n]], cbind(UN$Degree[[d]][,n2]/ rowSums(UN$Degree[[d]]), rep(hi[d], length(UN$Degree[[d]][,n2])), rep("DAME", length(UN$Degree[[d]][,n2]))))#
+	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,], na.rm=TRUE)[n2] / sum(Y[d,,], na.rm = TRUE), hi[d], "DAME"))#
+}#
+colnames(hello[[n]]) = c("Degree", "Year", "Model")#
+hello[[n]] = as.data.frame(hello[[n]])#
+hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))#
+#
+	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$Degree[[d]][,n2]/ rowSums(UN2$Degree[[d]]), rep(hi[d], length(UN2$Degree[[d]][,n2])), rep("AE", length(UN2$Degree[[d]][,n2]))))#
+	}#
+colnames(hello2[[n]]) = c("Degree", "Year", "Model")#
+hello2[[n]] = as.data.frame(hello2[[n]])#
+hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))#
+#
+hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$Degree[[d]][,n2]/rowSums(UN3$Degree[[d]]), rep(hi[d], length(UN3$Degree[[d]][,n2])), rep("NO", length(UN3$Degree[[d]][,n2]))))#
+	}#
+colnames(hello3[[n]]) = c("Degree", "Year", "Model")#
+hello3[[n]] = as.data.frame(hello3[[n]])#
+hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))#
+#
+hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)#
+	for (d in 1:Time){#
+	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$Degree[[d]][,n2]/ rowSums(UN4$Degree[[d]]), rep(hi[d], length(UN4$Degree[[d]][,n2])), rep("ME", length(UN4$Degree[[d]][,n2]))))#
+	}#
+colnames(hello4[[n]]) = c("Degree", "Year", "Model")#
+hello4[[n]] = as.data.frame(hello4[[n]])#
+hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))#
+hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))#
+colnames(mean[[n]]) =  c("Degree", "Year", "Model")#
+mean[[n]] = as.data.frame(mean[[n]])#
+n2 = n2 + 1#
+}#
+#
+countryname = (rownames(UN$U[[Time]]))#
+countryname2 = (rownames(UN$U[[Time]]))
+countrynames = ggplotColours(4)#
+p10 = list()#
+n2 = 1#
+for (n in 1:N){#
+	hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))#
+	mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))#
+	mean[[n]]$Year = hi#
+p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())#
+#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])#
+n2 = n2 + 1#
+#
+mname = paste0(countryname2[n], n, ".png")#
+#print(p10[[n]])#
+#ggsave(filename = mname, width = 12, height = 6)#
+}
+hey = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey = hey + sum((yhat[1001:2000]-y)^2)#
+	}#
+}#
+hey2 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "ME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey2 = hey2 + sum((yhat-y)^2)#
+	}#
+}#
+#
+hey3 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "AE",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey3 = hey3 + sum((yhat-y)^2)#
+	}#
+}#
+#
+hey4 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "NO",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey4 = hey4 + sum((yhat-y)^2)#
+	}#
+}
+head(hellonew[[3]])
+hey = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "DAME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey = hey + sum((yhat[1001:2000]-y)^2)#
+	}#
+}#
+hey2 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "ME",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey2 = hey2 + sum((yhat-y)^2)#
+	}#
+}#
+#
+hey3 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "AE",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey3 = hey3 + sum((yhat-y)^2)#
+	}#
+}#
+#
+hey4 = 0 #
+for (j in 1:97) {#
+	hello = hellonew[[j]]#
+	obs = mean[[j]]#
+for (i in 1:32) {#
+	yhat = as.numeric(as.character(hello[hello$Year == unique(hello$Year)[i] & hello$Model == "NO",1]))#
+	y = as.numeric(as.character(obs[i,1]))#
+	hey4 = hey4 + sum((yhat-y)^2)#
+	}#
+}
+hey
+hey2
+hey3
+hey4
+head(hellonew[[3]])
+UN$Degree[[d]][,n2]
+d
+n2
+UN$Degree[[d]][,1]
+rowSums(UN3$Degree[[d]])
+UN$D
+(1983:2014)[c(14,16,17)]
+UN$D[[32]]
+sapply(1:32, function(x) mean(Y[x,,][upper.tri(Y[x,,])]))
+summary(mcmc(UN$kappas))
+tp  =1
+diag(Y[1,,])
+summary(mcmc(UN$tau))
+rm(list=ls())
+load('~/Desktop/DAME_revised/UNdatafull.RData')
+attach(UNdatafull)
+for (tp in 1:Time) {#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+    if ("additive" %in% RE) {#
+      theta[tp, ] = row}#
+    if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    }#
+    Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+Time = 32#
+  for (tp in 1:Time) {#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+    if ("additive" %in% RE) {#
+      theta[tp, ] = row}#
+    if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    }#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+Time = 32#
+  for (tp in 1:Time) {#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+    if ("additive" %in% RE) {#
+      theta[tp, ] = row}#
+    if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    }#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+mu
+tp
+Time = 32#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    for (tp in 1:Time) {#
+#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+    if ("additive" %in% RE) {#
+      theta[tp, ] = row}#
+    if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    }#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+beta
+Time = 32#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    beta = matrix(0, Time, P)#
+#
+  for (tp in 1:Time) {#
+#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+    if ("additive" %in% RE) {#
+      theta[tp, ] = row}#
+    if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    }#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+Time = 32#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    beta = matrix(0, Time, 6)#
+#
+  for (tp in 1:Time) {#
+#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+    if ("additive" %in% RE) {#
+      theta[tp, ] = row}#
+    if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    }#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+Time = 32#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    beta = matrix(0, Time, 6)#
+#
+  for (tp in 1:Time) {#
+#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+   # if ("additive" %in% RE) {#
+      theta[tp, ] = row#
+     # }#
+    #if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    #}#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+Time = 32#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    beta = matrix(0, Time, 6)#
+  d = matrix(1, Time, R)#
+  U = array(0, dim = c(Time, N, R))#
+  theta = matrix(0, Time, N)#
+#
+  for (tp in 1:Time) {#
+#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+   # if ("additive" %in% RE) {#
+      theta[tp, ] = row#
+     # }#
+    #if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    #}#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+R=2#
+ Time = 32#
+ N = 97#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    beta = matrix(0, Time, 6)#
+  d = matrix(1, Time, R)#
+  U = array(0, dim = c(Time, N, R))#
+  theta = matrix(0, Time, N)#
+#
+  for (tp in 1:Time) {#
+#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+   # if ("additive" %in% RE) {#
+      theta[tp, ] = row#
+     # }#
+    #if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    #}#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+d
+rm(list=ls())
+load('~/Desktop/DAME_revised/UNdatafull.RData')
+attach(UNdatafull)
+R=2#
+ Time = 32#
+ N = 97#
+  	  na.positions = lapply(1:Time, function(tp) {#
+    which(is.na(Y[tp, , ]))#
+  })#
+    beta = matrix(0, Time, 6)#
+  d = matrix(1, Time, R)#
+  U = array(0, dim = c(Time, N, R))#
+  theta = matrix(0, Time, N)#
+#
+  for (tp in 1:Time) {#
+#
+    mu = mean(Y[tp, , ], na.rm = TRUE)#
+    row = rowMeans(Y[tp, , ] - mu, na.rm = TRUE)#
+    row[is.na(row)] = 0#
+    YA = mu + outer(row, row, "+")#
+    Y[tp, , ][na.positions[[tp]]] = YA[na.positions[[tp]]]#
+    diag(Y[tp, , ]) = 0#
+    beta[tp, 1] = mu#
+   # if ("additive" %in% RE) {#
+      theta[tp, ] = row#
+     # }#
+    #if ("multiplicative" %in% RE) {#
+      eigenError = eigen(Y[tp, , ] - YA)#
+      eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)#
+      signs = eigenError$val[eR]#
+      d[tp, ] = ifelse(signs > 0, 1, -1)#
+    #}#
+  #  Y[tp, , ][meaningful_NA[[tp]]] = NA#
+  }
+d
+rm(list=ls())
+load('~/Desktop/DAME_revised/UNdatafull.RData')
+attach(UNdatafull)
+rm(UNdatafull)
+rm(X)
+rm(Y)
+load('~/Desktop/DAME_revised/UNdatafull.RData')
+attach(UNdatafull)

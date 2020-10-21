@@ -691,11 +691,6 @@ DAME_MH_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, di
       Y[tp, , ][meaningful_NA[[tp]]] = NA
     }
   }
-  XB = lapply(1:Time, function(tp) {
-    Reduce('+', lapply(1:P, function(p){
-      X[tp, , , p] * beta[tp, p]
-    }))
-  })
   na.positions = lapply(1:Time, function(tp) {
     which(is.na(Y[tp, , ]))
   })
@@ -717,6 +712,11 @@ DAME_MH_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, di
     }
     Y[tp, , ][meaningful_NA[[tp]]] = NA
   }
+  XB = lapply(1:Time, function(tp) {
+    Reduce('+', lapply(1:P, function(p){
+      X[tp, , , p] * beta[tp, p]
+    }))
+  })
   UDU = UDUPS
   uppertri = upper.tri(diag(N))
   # starting the Gibbs sampler
@@ -762,7 +762,7 @@ DAME_MH_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, di
       }
     }
     if ("multiplicative" %in% RE) {
-    	if (iter < burn) { prop = 0.1 } else { prop = 0.01 }
+    	if (iter < burn) { prop = 0.1 } else { prop = 0.025 }
       if (iter > 0.1 * burn) {
         #M-H of kappa_r
         for (r in 1:R) {
@@ -778,13 +778,10 @@ DAME_MH_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, di
             tau_u[r] = var.new[2]
           }
         }
-       #if (iter == burn + 500) {browser()}
 	  U = ru_fc_NA_revised(XB, theta, U, d, Y, cinv[(P+2):(P+1+R)], tau_u, s2, meaningful_NA_rows)
       d = rd_fc2_revised(XB, theta, U, d, Y, s2, meaningful_NA)
       for (tp in meaningful_NA_years) {
-      	if (length(meaningful_NA_rows[[tp]]) > 0){
         U[tp, meaningful_NA_rows[[tp]],] = NA
-        }
       }
       UDU = lapply(1:Time, function(tp) {
         if (R <= 1) {
@@ -967,11 +964,6 @@ DAME_UU_fixed_revised = function(Y, X, RE = c("additive", "multiplicative"), R =
             Y[tp, , ][meaningful_NA[[tp]]] = NA
         }
     }
-    XB = lapply(1:Time, function(tp) {
-        Reduce('+', lapply(1:P, function(p){
-            X[tp, , , p] * beta[tp, p]
-        }))
-    })
     na.positions = lapply(1:Time, function(tp) {
         which(is.na(Y[tp, , ]))
     })
@@ -986,14 +978,13 @@ DAME_UU_fixed_revised = function(Y, X, RE = c("additive", "multiplicative"), R =
         if ("additive" %in% RE) {
       	theta[tp, ] = row
       	}
-      	if ("multiplicative" %in% RE) {
-      	eigenError = eigen(Y[tp, , ] - YA)
-      	eR = which(rank(-abs(eigenError$val), ties.method = "first") <= R)
-      	signs = eigenError$val[eR]
-      	d[tp, ] = ifelse(signs > 0, 1, -1)
-    	}
         Y[tp, , ][meaningful_NA[[tp]]] = NA
     }
+    XB = lapply(1:Time, function(tp) {
+        Reduce('+', lapply(1:P, function(p){
+            X[tp, , , p] * beta[tp, p]
+        }))
+    })
     UDU = UDUPS
     uppertri = upper.tri(diag(N))
     tau_p = rep(1, P)
@@ -1001,7 +992,7 @@ DAME_UU_fixed_revised = function(Y, X, RE = c("additive", "multiplicative"), R =
   	tau_u = rep(N, R)
     # starting the Gibbs sampler
     for (iter in 1:(burn + nscan)) {
-        if (iter %% 500 == 0) print(iter)
+        if (iter %% 100 == 0) print(iter)
         s2 = rs2_fc2(XB, theta, UDU, Y, a, b)
         tau_p = rtaup_fc(beta, cinv[1:P], a, b)
         beta = rbeta_fc(X, beta, theta, UDU, Y, cinv[1:P], tau_p, s2)
@@ -1019,11 +1010,11 @@ DAME_UU_fixed_revised = function(Y, X, RE = c("additive", "multiplicative"), R =
         }
         if ("multiplicative" %in% RE) {
         if (iter > 0.1 * burn) {
-             tau_u = rtauu_fc(U, cinv[(P+2):(P+1+R)], a, b)
-        		U = ru_fc_NA_revised(XB, theta, U, d, Y, cinv[(P+2):(P+1+R)], tau_u, s2, meaningful_NA_rows)
-        for (tp in meaningful_NA_years) {
-            U[tp, meaningful_NA_rows[[tp]],] = NA
-        }
+        	 U = ru_fc_NA_revised(XB, theta, U, d, Y, cinv[(P+2):(P+1+R)], tau_u, s2, meaningful_NA_rows)
+        	 tau_u = rtauu_fc(U, cinv[(P+2):(P+1+R)], a, b)
+      for (tp in meaningful_NA_years) {
+        U[tp, meaningful_NA_rows[[tp]],] = NA
+      }
         UDU = lapply(1:Time, function(tp) {
             U[tp, , ] %*% t(U[tp, ,])
         })
