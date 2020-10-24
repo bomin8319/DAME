@@ -81,7 +81,92 @@ UN4 = UN5
 
 #########summary of results#######
 ## side by side plot
+
 hi = factor(1983:2014)
+hello = list()
+hello2 = list()
+hello3 = list()
+hello4 = list()
+hellonew = list()
+mean = list()
+
+Y = Y * 100
+n2 = 1
+for	(n in 1:N){
+  print(n)
+  hello[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  mean[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    diag(Y[d,, ])= 0
+    Y[d, which(avail1[d,]==0), ] = 0
+    Y[d, , which(avail1[d,]==0)] = 0
+    Y[d, , ][which(is.na(Y[d, , ]))] = 0	
+    hello[[n]]  = rbind(hello[[n]], cbind(UN$Degree[[d]][,n2], rep(hi[d], length(UN$Degree[[d]][,n2])), rep("DAME", length(UN$Degree[[d]][,n2]))))
+    mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,], na.rm=TRUE)[n2], hi[d], "DAME"))
+  }
+  colnames(hello[[n]]) = c("Degree", "Year", "Model")
+  hello[[n]] = as.data.frame(hello[[n]])
+  hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))
+  
+  hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$Degree[[d]][,n2], rep(hi[d], length(UN2$Degree[[d]][,n2])), rep("AE", length(UN2$Degree[[d]][,n2]))))
+  }
+  colnames(hello2[[n]]) = c("Degree", "Year", "Model")
+  hello2[[n]] = as.data.frame(hello2[[n]])
+  hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))
+  
+  hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$Degree[[d]][,n2], rep(hi[d], length(UN3$Degree[[d]][,n2])), rep("NO", length(UN3$Degree[[d]][,n2]))))
+  }
+  colnames(hello3[[n]]) = c("Degree", "Year", "Model")
+  hello3[[n]] = as.data.frame(hello3[[n]])
+  hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))
+  
+  hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$Degree[[d]][,n2], rep(hi[d], length(UN4$Degree[[d]][,n2])), rep("ME", length(UN4$Degree[[d]][,n2]))))
+  }
+  colnames(hello4[[n]]) = c("Degree", "Year", "Model")
+  hello4[[n]] = as.data.frame(hello4[[n]])
+  hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))
+  
+  
+  hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))
+  colnames(mean[[n]]) =  c("Degree", "Year", "Model")
+  mean[[n]] = as.data.frame(mean[[n]])
+  n2 = n2 + 1
+}
+
+countryname = (rownames(UN$U[[Time]]))
+countryname2 = (rownames(UN$U[[Time]]))
+
+
+######degree statistics
+setwd('/Users/bomin8319/Desktop/model_validation_new')
+countrynames = ggplotColours(4)
+p10 = list()
+n2 = 1
+for (n in 1:N){
+  hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))
+  mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))
+  mean[[n]]$Year = hi
+  p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+  #annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])
+  n2 = n2 + 1
+  
+  mname = paste0(countryname2[n], n, ".png")
+  print(p10[[n]])
+  ggsave(filename = mname, width = 12, height = 6)
+}
+
+
+
+
+
+
+#secondDegree
 hello = list()
 hello2 = list()
 hello3 = list()
@@ -91,235 +176,146 @@ mean = list()
 
 n2 = 1
 for	(n in 1:N){
-	print(n)
-	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	diag(Y[d,, ])= 0
-	Y[d, which(avail1[d,]==0), ] = 0
-	Y[d, , which(avail1[d,]==0)] = 0
-	Y[d, , ][which(is.na(Y[d, , ]))] = 0	
-	hello[[n]]  = rbind(hello[[n]], cbind(UN$Degree[[d]][,n2]/ rowSums(UN$Degree[[d]]), rep(hi[d], length(UN$Degree[[d]][,n2])), rep("DAME", length(UN$Degree[[d]][,n2]))))
-	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,], na.rm=TRUE)[n2] / sum(Y[d,,], na.rm = TRUE), hi[d], "DAME"))
-}
-colnames(hello[[n]]) = c("Degree", "Year", "Model")
-hello[[n]] = as.data.frame(hello[[n]])
-hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))
-
-	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$Degree[[d]][,n2]/ rowSums(UN2$Degree[[d]]), rep(hi[d], length(UN2$Degree[[d]][,n2])), rep("AE", length(UN2$Degree[[d]][,n2]))))
-	}
-colnames(hello2[[n]]) = c("Degree", "Year", "Model")
-hello2[[n]] = as.data.frame(hello2[[n]])
-hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))
-
-hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$Degree[[d]][,n2]/rowSums(UN3$Degree[[d]]), rep(hi[d], length(UN3$Degree[[d]][,n2])), rep("NO", length(UN3$Degree[[d]][,n2]))))
-	}
-colnames(hello3[[n]]) = c("Degree", "Year", "Model")
-hello3[[n]] = as.data.frame(hello3[[n]])
-hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))
-
-hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$Degree[[d]][,n2]/ rowSums(UN4$Degree[[d]]), rep(hi[d], length(UN4$Degree[[d]][,n2])), rep("ME", length(UN4$Degree[[d]][,n2]))))
-	}
-colnames(hello4[[n]]) = c("Degree", "Year", "Model")
-hello4[[n]] = as.data.frame(hello4[[n]])
-hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))
-
-
-hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))
-colnames(mean[[n]]) =  c("Degree", "Year", "Model")
-mean[[n]] = as.data.frame(mean[[n]])
-n2 = n2 + 1
+  print(n)
+  hello[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  mean[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    #diag(Y[d,, ])= 0
+    #Y[d, which(avail1[d,]==0), ] = 0
+    #Y[d, , which(avail1[d,]==0)] = 0
+    #Y[d, , ][which(is.na(Y[d, , ]))] = 0	
+    hello[[n]]  = rbind(hello[[n]], cbind(UN$secondDegree[[d]][,n2], rep(hi[d], length(UN$secondDegree[[d]][,n2])), rep("DAME", length(UN$secondDegree[[d]][,n2]))))
+    mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2], hi[d], "DAME"))
+  }
+  colnames(hello[[n]]) = c("SecondDegree", "Year", "Model")
+  hello[[n]] = as.data.frame(hello[[n]])
+  hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))
+  
+  hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$secondDegree[[d]][,n2], rep(hi[d], length(UN2$secondDegree[[d]][,n2])), rep("AE", length(UN2$secondDegree[[d]][,n2]))))
+  }
+  colnames(hello2[[n]]) = c("SecondDegree", "Year", "Model")
+  hello2[[n]] = as.data.frame(hello2[[n]])
+  hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))
+  
+  hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$secondDegree[[d]][,n2], rep(hi[d], length(UN3$secondDegree[[d]][,n2])), rep("NO", length(UN3$secondDegree[[d]][,n2]))))
+  }
+  colnames(hello3[[n]]) = c("SecondDegree", "Year", "Model")
+  hello3[[n]] = as.data.frame(hello3[[n]])
+  hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))
+  
+  hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$secondDegree[[d]][,n2], rep(hi[d], length(UN4$secondDegree[[d]][,n2])), rep("ME", length(UN4$secondDegree[[d]][,n2]))))
+  }
+  colnames(hello4[[n]]) = c("SecondDegree", "Year", "Model")
+  hello4[[n]] = as.data.frame(hello4[[n]])
+  hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))
+  
+  
+  hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))
+  colnames(mean[[n]]) =  c("SecondDegree", "Year", "Model")
+  mean[[n]] = as.data.frame(mean[[n]])
+  n2 = n2 + 1
 }
 
 countryname = (rownames(UN$U[[Time]]))
 countryname2 = (rownames(UN$U[[Time]]))
 
-
-
-######degree statistics
-setwd('/Users/bomin8319/Desktop/model_validation_new')
-countrynames = ggplotColours(4)
 p10 = list()
 n2 = 1
 for (n in 1:N){
-	hellonew[[n]]$Degree = as.numeric(as.character(hellonew[[n]]$Degree))
-	mean[[n]]$Degree = as.numeric(as.character(mean[[n]]$Degree))
-	mean[[n]]$Year = hi
-p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = Degree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])
-n2 = n2 + 1
-
-mname = paste0(countryname2[n], n, ".png")
-print(p10[[n]])
-ggsave(filename = mname, width = 12, height = 6)
+  hellonew[[n]]$SecondDegree = as.numeric(as.character(hellonew[[n]]$SecondDegree))
+  mean[[n]]$SecondDegree = as.numeric(as.character(mean[[n]]$SecondDegree))
+  mean[[n]]$Year = hi
+  p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = SecondDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+  
+  #annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])
+  n2 = n2 + 1
+  
+  mname = paste0(countryname2[n], n, "second.png")
+  print(p10[[n]])
+  ggsave(filename = mname, width = 12, height = 6)
 }
 
-#seconddegree
-hi = factor(1983:2014)
+#thirdDegree
 hello = list()
 hello2 = list()
 hello3 = list()
 hello4 = list()
 hellonew = list()
 mean = list()
-countrynames = sort(rownames(UN$U[[Time]]))
 
 n2 = 1
-for 	(n in 1:N){
-	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello[[n]]  = rbind(hello[[n]], cbind(UN$secondDegree[[d]][,n2]/rowSums(UN$secondDegree[[d]]), rep(hi[d], length(UN$secondDegree[[d]][,n2])), rep("DAME", length(UN$secondDegree[[d]][,n2]))))
-	diag(Y[d,, ])= 0
-	Y[d, which(avail1[d,]==0), ] = 0
-	Y[d, , which(avail1[d,]==0)] = 0
-	Y[d, , ][which(is.na(Y[d, , ]))] = 0
-	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2]/ sum(Y[d,,] %*% Y[d,,], na.rm = TRUE), hi[d], "DAME"))
-}
-colnames(hello[[n]]) = c("SecondDegree", "Year", "Model")
-hello[[n]] = as.data.frame(hello[[n]])
-hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))
-
-	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$secondDegree[[d]][,n2]/rowSums(UN2$secondDegree[[d]]), rep(hi[d], length(UN2$secondDegree[[d]][,n2])), rep("AE", length(UN2$secondDegree[[d]][,n2]))))
-	}
-colnames(hello2[[n]]) = c("SecondDegree", "Year", "Model")
-hello2[[n]] = as.data.frame(hello2[[n]])
-hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))
-
-hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$secondDegree[[d]][,n2]/rowSums(UN3$secondDegree[[d]]), rep(hi[d], length(UN3$secondDegree[[d]][,n2])), rep("NO", length(UN3$secondDegree[[d]][,n2]))))
-	}
-colnames(hello3[[n]]) = c("SecondDegree", "Year", "Model")
-hello3[[n]] = as.data.frame(hello3[[n]])
-hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))
-
-hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$secondDegree[[d]][,n2]/rowSums(UN4$secondDegree[[d]]), rep(hi[d], length(UN4$secondDegree[[d]][,n2])), rep("ME", length(UN4$secondDegree[[d]][,n2]))))
-	}
-colnames(hello4[[n]]) = c("SecondDegree", "Year", "Model")
-hello4[[n]] = as.data.frame(hello4[[n]])
-hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))
-
-hellonew[[n]] = as.data.frame(rbind(hello[[n]],hello4[[n]], hello2[[n]], hello3[[n]]))
-colnames(mean[[n]]) =  c("SecondDegree", "Year", "Model")
-mean[[n]] = as.data.frame(mean[[n]])
-n2 = n2 + 1
+for	(n in 1:N){
+  print(n)
+  hello[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  mean[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    #diag(Y[d,, ])= 0
+    #Y[d, which(avail1[d,]==0), ] = 0
+    #Y[d, , which(avail1[d,]==0)] = 0
+    #Y[d, , ][which(is.na(Y[d, , ]))] = 0	
+    hello[[n]]  = rbind(hello[[n]], cbind(UN$thirdDegree[[d]][,n2], rep(hi[d], length(UN$thirdDegree[[d]][,n2])), rep("DAME", length(UN$thirdDegree[[d]][,n2]))))
+    mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2], hi[d], "DAME"))
+  }
+  colnames(hello[[n]]) = c("ThirdDegree", "Year", "Model")
+  hello[[n]] = as.data.frame(hello[[n]])
+  hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))
+  
+  hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$thirdDegree[[d]][,n2], rep(hi[d], length(UN2$thirdDegree[[d]][,n2])), rep("AE", length(UN2$thirdDegree[[d]][,n2]))))
+  }
+  colnames(hello2[[n]]) = c("ThirdDegree", "Year", "Model")
+  hello2[[n]] = as.data.frame(hello2[[n]])
+  hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))
+  
+  hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$thirdDegree[[d]][,n2], rep(hi[d], length(UN3$thirdDegree[[d]][,n2])), rep("NO", length(UN3$thirdDegree[[d]][,n2]))))
+  }
+  colnames(hello3[[n]]) = c("ThirdDegree", "Year", "Model")
+  hello3[[n]] = as.data.frame(hello3[[n]])
+  hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))
+  
+  hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)
+  for (d in 1:Time){
+    hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$thirdDegree[[d]][,n2], rep(hi[d], length(UN4$thirdDegree[[d]][,n2])), rep("ME", length(UN4$thirdDegree[[d]][,n2]))))
+  }
+  colnames(hello4[[n]]) = c("ThirdDegree", "Year", "Model")
+  hello4[[n]] = as.data.frame(hello4[[n]])
+  hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))
+  
+  
+  hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))
+  colnames(mean[[n]]) =  c("ThirdDegree", "Year", "Model")
+  mean[[n]] = as.data.frame(mean[[n]])
+  n2 = n2 + 1
 }
 
 countryname = (rownames(UN$U[[Time]]))
 countryname2 = (rownames(UN$U[[Time]]))
-ggplotColours <- function(n = 6, h = c(0, 360) + 15){
-  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n
-  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)
-}
-countrynames = ggplotColours(4)
+
 p10 = list()
 n2 = 1
 for (n in 1:N){
-	hellonew[[n]]$SecondDegree = as.numeric(as.character(hellonew[[n]]$SecondDegree))
-	mean[[n]]$SecondDegree = as.numeric(as.character(mean[[n]]$SecondDegree))
-	mean[[n]]$Year = hi
-p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = SecondDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-
-#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])
-n2 = n2 + 1
-
-mname = paste0(countryname2[n], n, "second.png")
-print(p10[[n]])
-ggsave(filename = mname, width = 12, height = 6)
+  hellonew[[n]]$ThirdDegree = as.numeric(as.character(hellonew[[n]]$ThirdDegree))
+  mean[[n]]$ThirdDegree = as.numeric(as.character(mean[[n]]$ThirdDegree))
+  mean[[n]]$Year = hi
+  p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = ThirdDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) + geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+  
+  #annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])
+  n2 = n2 + 1
+  
+  mname = paste0(countryname2[n], n, "third.png")
+  print(p10[[n]])
+  ggsave(filename = mname, width = 12, height = 6)
 }
 
-
-#thirddegree
-hi = factor(1983:2014)
-hello = list()
-hello2 = list()
-hello3 = list()
-hello4 = list()
-hellonew = list()
-mean = list()
-countrynames = sort(rownames(UN$U[[Time]]))
-
-n2 = 1
-for 	(n in 1:N){
-	hello[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	mean[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello[[n]]  = rbind(hello[[n]], cbind(UN$thirdDegree[[d]][,n2]/rowSums(UN$thirdDegree[[d]]), rep(hi[d], length(UN$thirdDegree[[d]][,n2])), rep("DAME", length(UN$thirdDegree[[d]][,n2]))))
-	diag(Y[d,, ])= 0
-	Y[d, which(avail1[d,]==0), ] = 0
-	Y[d, , which(avail1[d,]==0)] = 0
-	Y[d, , ][which(is.na(Y[d, , ]))] = 0
-	mean[[n]] = rbind(mean[[n]], c(rowSums(Y[d,,] %*% Y[d,,] %*% Y[d,,], na.rm = TRUE)[n2]/sum(Y[d,,] %*% Y[d,,] %*% Y[d,,], na.rm = TRUE), hi[d], "DAME"))
-}
-colnames(hello[[n]]) = c("ThirdDegree", "Year", "Model")
-hello[[n]] = as.data.frame(hello[[n]])
-hello[[n]]$Year = factor(sort(as.numeric(hello[[n]]$Year)), labels = c(1983:2014))
-
-	hello2[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello2[[n]]  = rbind(hello2[[n]], cbind(UN2$thirdDegree[[d]][,n2]/rowSums(UN2$thirdDegree[[d]]), rep(hi[d], length(UN2$thirdDegree[[d]][,n2])), rep("AE", length(UN2$thirdDegree[[d]][,n2]))))
-	}
-colnames(hello2[[n]]) = c("ThirdDegree", "Year", "Model")
-hello2[[n]] = as.data.frame(hello2[[n]])
-hello2[[n]]$Year = factor(sort(as.numeric(hello2[[n]]$Year)), labels = c(1983:2014))
-
-hello3[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello3[[n]]  = rbind(hello3[[n]], cbind(UN3$thirdDegree[[d]][,n2]/rowSums(UN3$thirdDegree[[d]]), rep(hi[d], length(UN3$thirdDegree[[d]][,n2])), rep("NO", length(UN3$thirdDegree[[d]][,n2]))))
-	}
-colnames(hello3[[n]]) = c("ThirdDegree", "Year", "Model")
-hello3[[n]] = as.data.frame(hello3[[n]])
-hello3[[n]]$Year = factor(sort(as.numeric(hello3[[n]]$Year)), labels = c(1983:2014))
-
-
-hello4[[n]] = matrix(NA, nrow = 0, ncol = 3)
-	for (d in 1:Time){
-	hello4[[n]]  = rbind(hello4[[n]], cbind(UN4$thirdDegree[[d]][,n2]/rowSums(UN4$thirdDegree[[d]]), rep(hi[d], length(UN4$thirdDegree[[d]][,n2])), rep("ME", length(UN4$thirdDegree[[d]][,n2]))))
-	}
-colnames(hello4[[n]]) = c("ThirdDegree", "Year", "Model")
-hello4[[n]] = as.data.frame(hello4[[n]])
-hello4[[n]]$Year = factor(sort(as.numeric(hello4[[n]]$Year)), labels = c(1983:2014))
-
-
-hellonew[[n]] = as.data.frame(rbind(hello[[n]], hello4[[n]], hello2[[n]], hello3[[n]]))
-colnames(mean[[n]]) =  c("ThirdDegree", "Year", "Model")
-mean[[n]] = as.data.frame(mean[[n]])
-n2 = n2 + 1
-}
-
-countryname = (rownames(UN$U[[Time]]))
-countryname2 = (rownames(UN$U[[Time]]))
-ggplotColours <- function(n = 6, h = c(0, 360) + 15){
-  if ((diff(h) %% 360) < 1) h[2] <- h[2] - 360/n
-  hcl(h = (seq(h[1], h[2], length = n)), c = 100, l = 65)
-}
-countrynames = ggplotColours(4)
-p10 = list()
-n2 = 1
-for (n in 1:N){
-	hellonew[[n]]$ThirdDegree = as.numeric(as.character(hellonew[[n]]$ThirdDegree))
-	mean[[n]]$ThirdDegree = as.numeric(as.character(mean[[n]]$ThirdDegree))
-	mean[[n]]$Year = hi
-p10[[n]] = ggplot(hellonew[[n]], aes(x = Year, y = ThirdDegree, color= Model, fill =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal() +scale_fill_manual(values = alpha(countrynames,0.5), name = countryname[n])+scale_color_manual(values = countrynames,name = countryname[n]) +  geom_line(data = mean[[n]], color = "blue", size = 0.2, group = 1)+geom_point(data = mean[[n]], color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-
-#annotate("text", 30, 10, size = 5, label = countryname2[n], colour = countrynames[n])
-n2 = n2 + 1
-
-mname = paste0(countryname2[n], n, "third.png")
-print(p10[[n]])
-ggsave(filename = mname, width = 12, height = 6)
-}
 
 
 ##########estimated coefficients####
@@ -550,6 +546,93 @@ p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(da
 plots[[t]] = p+ geom_text(size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
 }
 marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+
+
+###############################
+#updated negative D version
+###############################
+#UD plots_full
+setwd('/Users/bomin8319/Desktop/UDU')
+years = c(1983:2014)
+
+Xstar = matrix(0, nrow = N, ncol = 2)
+rownames(Xstar) = sort(rownames(UN$U[[Time]]))
+rownames(Xstar)[which(rownames(Xstar) == "GFR")] = "GMY"
+Xstar[94, ]= c(0,1)
+Xstar[48, ] = c(1,0)
+#Xstar[19, ] = c(0, -1)
+##Xstar[20, ] = c(0.5, 0.5)
+#Xstar[11, ] = c(1, 0)
+#Xstar[16,] =c(0.5, 1)
+plots= list()
+data2 = list()
+colors = sort(rownames(Xstar))
+for (t in c(1:Time)[-c(14, 16, 17)]) {
+UDmat = matrix(NA, N, 2)
+rownames(UDmat) = colors
+rownames(UN$U[[t]])[which(rownames(UN$U[[t]]) == "GFR")] = "GMY"
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * sqrt(UN$D[[t]][1]) 
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * sqrt(UN$D[[t]][2])
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),] = procrustes(UDmat[which(rownames(UDmat) %in% rownames(UN$U[[t]])),], Xstar[which(rownames(Xstar) %in% rownames(UN$U[[t]])),])$X.new
+#UDmat = UDmat - UDmat[which(rownames(UDmat) =="USA"),]
+data2[[t]] = data.frame(UDmat)
+colnames(data2[[t]])[1:2] = c("r1", "r2")
+Xstar = UDmat
+Xstar[is.na(Xstar)] = rep(0, 2)
+}
+#rangex = summary(unlist(sapply(1:Time, function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
+#rangey = summary(unlist(sapply(1:Time, function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
+
+for (t in c(1:Time)[-c(14, 16, 17)]) {
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))
+
+plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+mname = paste0("plot", t, "full.png")
+print(plots[[t]])
+ggsave(filename = mname)
+}
+
+#rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
+#rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
+for (t in c(4,8,12,16,20,24,28,Time)) {
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
+
+
+plots[[t]] = p+ geom_text(size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+}
+marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+
+#UD plots_reduced
+data3 = list()
+for (t in 1:Time) {
+    data3[[t]] = data2[[t]][rownames(data2[[t]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]
+}
+plots= list()
+colors = sort(rownames(data3[[1]]))
+for (t in 1:Time) {
+    colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+    p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]])))
+    
+    plots[[t]] = p+ geom_text(size = 5, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+    mname = paste0("plot", t, "reduced.png")
+    print(plots[[t]])
+   ggsave(filename = mname)
+}
+
+
+
+#rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
+#rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
+for (t in c(4,8,12,16,20,24,28,Time)) {
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")
+
+plots[[t]] = p+ geom_text(size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+}
+marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+
 
 
 
@@ -874,3 +957,23 @@ for (i in 1:32) {
 
 gelman.diag = list(beta = output, theta = output2, tau = output3, kappa = output4, D = output5, U1 = output6, U2 = output7)
 save(gelman.diag, file = "/Users/bomin8319/Desktop/gelmandiag.RData")
+
+
+
+
+for (d in 1:Time){
+  diag(Y[d,, ])= 0
+  Y[d, which(avail1[d,]==0), ] = 0
+  Y[d, , which(avail1[d,]==0)] = 0
+  Y[d, , ][which(is.na(Y[d, , ]))] = 0	
+} 
+error = list()
+for (t in 1:32){
+  error[[t]] = (Y[t,,][upper.tri(Y[t,,])])*100 - UN$YPM[[t]][upper.tri(UN$YPM[[t]])]
+}
+
+error = unlist(error)
+error = data.frame(residual = error[-which(error==0)])
+#error = error[-which(error==0),]
+ggplot(error, aes(x=residual)) + geom_histogram(binwidth = 0.5, fill = "grey", color = "black")+ xlim(-15, 15) +
+  geom_density(alpha=.7, fill="#FF6666") + scale_color_grey() + theme_minimal()
