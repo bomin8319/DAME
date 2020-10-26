@@ -554,19 +554,23 @@ marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
 #UD plots_full
 setwd('/Users/bomin8319/Desktop/UDU')
 years = c(1983:2014)
-
+Xstar_all = list()
 Xstar = matrix(0, nrow = N, ncol = 2)
-rownames(Xstar) = sort(rownames(UN$U[[Time]]))
+#rownames(Xstar) = sort(rownames(UN$U[[Time]]))
+rownames(Xstar) = rownames(UN$U[[Time]])
 rownames(Xstar)[which(rownames(Xstar) == "GFR")] = "GMY"
-Xstar[94, ]= c(0,1)
-Xstar[48, ] = c(1,0)
+#Xstar[94, ]= c(0,1)
+#Xstar[48, ] = c(1,0)
+Xstar[1, ]= c(0,1)
+Xstar[90, ] = c(1,0)
 #Xstar[19, ] = c(0, -1)
 ##Xstar[20, ] = c(0.5, 0.5)
 #Xstar[11, ] = c(1, 0)
 #Xstar[16,] =c(0.5, 1)
 plots= list()
 data2 = list()
-colors = sort(rownames(Xstar))
+#colors = sort(rownames(Xstar))
+colors = rownames(Xstar)
 for (t in c(1:Time)[-c(14, 16, 17)]) {
 UDmat = matrix(NA, N, 2)
 rownames(UDmat) = colors
@@ -579,6 +583,7 @@ data2[[t]] = data.frame(UDmat)
 colnames(data2[[t]])[1:2] = c("r1", "r2")
 Xstar = UDmat
 Xstar[is.na(Xstar)] = rep(0, 2)
+Xstar_all[[t]] = Xstar
 }
 #rangex = summary(unlist(sapply(1:Time, function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
 #rangey = summary(unlist(sapply(1:Time, function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
@@ -593,24 +598,71 @@ print(plots[[t]])
 ggsave(filename = mname)
 }
 
+######circleplot
+
+for (t in c(1:Time)[c(14, 16, 17)]) {
+	Xstar = Xstar_all[[t-1]]
+	if (t!= 17) {
+	Xstar = cbind(Xstar, -Xstar[,2])
+	}
+UDmat = matrix(NA, N, 3)
+rownames(UDmat) = colors
+rownames(UN$U[[t]])[which(rownames(UN$U[[t]]) == "GFR")] = "GMY"
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * sqrt(UN$D[[t]][1]) 
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * sqrt(abs(UN$D[[t]][2]))
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),3] =  -UN$U[[t]][,2] * sqrt(abs(UN$D[[t]][2]))
+
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),] = procrustes(UDmat[which(rownames(UDmat) %in% rownames(UN$U[[t]])),], Xstar[which(rownames(Xstar) %in% rownames(UN$U[[t]])),])$X.new
+#UDmat = UDmat - UDmat[which(rownames(UDmat) =="USA"),]
+data2[[t]] = data.frame(UDmat)
+colnames(data2[[t]])[1:3] = c("r1", "r2", "r3")
+Xstar = UDmat
+Xstar[is.na(Xstar)] = rep(0, 3)
+Xstar_all[[t]] = Xstar
+}
+#rangex = summary(unlist(sapply(1:Time, function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
+#rangey = summary(unlist(sapply(1:Time, function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
+
+for (t in c(1:Time)[c(14, 16, 17)]) {
+	data3 = melt(data2[[t]], id.vars = "r1")
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data3, aes(x = r1, y = value, colour = variable, label = rep(rownames(data2[[t]]),2)))
+
+plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) 
+
+mname = paste0("plot", t, "full.png")
+print(plots[[t]])
+ggsave(filename = mname)
+}
+#############################
+
+
 #rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
 #rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-for (t in c(4,8,12,16,20,24,28,Time)) {
+for (t in c(4,8,12,20,24,28,Time)) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
 p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
-
-
 plots[[t]] = p+ geom_text(size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
 }
+t = 16
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+	data3 = melt(data2[[t]], id.vars = "r1")
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data3, aes(x = r1, y = value, colour = variable, label = rep(rownames(data2[[t]]),2)))
+
+plots[[t]] = p+ geom_text(size = 2, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) + labs(x = "r = 1", y = "r = 2")
+
+
 marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+
 
 #UD plots_reduced
 data3 = list()
-for (t in 1:Time) {
+for (t in c(1:Time)[-c(14, 16, 17)]) {
     data3[[t]] = data2[[t]][rownames(data2[[t]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]
 }
 plots= list()
-colors = sort(rownames(data3[[1]]))
+colors = rownames(data3[[1]])
 for (t in 1:Time) {
     colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
     p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]])))
@@ -620,19 +672,40 @@ for (t in 1:Time) {
     print(plots[[t]])
    ggsave(filename = mname)
 }
+for (t in c(1:Time)[c(14, 16, 17)]) {
+	  data3[[t]] = data2[[t]][rownames(data2[[t]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]
+	data4 = melt(data3[[t]], id.vars = "r1")
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data4, aes(x = r1, y = value, colour = variable, label = rep(rownames(data3[[t]]),2)))
+
+plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) 
+
+mname = paste0("plot", t, "reduced.png")
+print(plots[[t]])
+ggsave(filename = mname)
+}
+#############################
 
 
 
 #rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
 #rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-for (t in c(4,8,12,16,20,24,28,Time)) {
+for (t in c(4,8,12,20,24,28,Time)) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
 p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")
 
 plots[[t]] = p+ geom_text(size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
 }
+t = 16
+	data4 = melt(data3[[t]], id.vars = "r1")
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data4, aes(x = r1, y = value, colour = variable, label = rep(rownames(data3[[t]]),2)))
+
+plots[[t]] = p+ geom_text(size = 3, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) + labs(x = "r = 1", y = "r = 2")
+
 marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
 
+marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)], nrow = 2, ncol = 4, top = NULL)
 
 
 
