@@ -330,7 +330,7 @@ years = c(1983:2014)
 data = data.frame(cbind(years,t(betas[[i]])))
  colnames(data)[4] = "beta"
  f = ggplot(data, aes(x = years))
-plots[[1]]=f + geom_line(aes(y = beta), colour=betacols[1]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + scale_x_continuous(breaks=number_ticks(8))+ylab("Intercept") + theme_minimal()
+plots[[1]]=f + geom_line(aes(y = beta), colour="black") + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + scale_x_continuous(breaks=number_ticks(8))+ylab("Intercept") + theme_minimal()
 
 color =betacols[-1]
 varname = c("log(distance)", "Polity", "Alliance", "Lower trade-to-GDP ratio", "Common Language")
@@ -340,7 +340,7 @@ data = data.frame(cbind(years,t(betas[[i]])))
  colnames(data)[4] = "beta"
  f = ggplot(data, aes(x = years))
  
- plots[[i]] <- f + geom_line(aes(y = beta), colour=color[i-1]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + ylab(varname[i-1]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()
+ plots[[i]] <- f + geom_line(aes(y = beta), colour="black") + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + ylab(varname[i-1]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()
 
  }
  marrangeGrob(plots[1:6], nrow = 2, ncol = 3, top = NULL)
@@ -416,9 +416,8 @@ years = c(1983:2014)
 data = data.frame(cbind(years,t(Ds[[i]])))
  colnames(data)[4] = "D"
  f = ggplot(data, aes(x = years))
- 
- plots[[i]] <- f + geom_line(aes(y = D), colour=color[i]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + ylab(varname[i]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()
-Dout = cbind(Dout, data)
+ plots[[i]] <- f + geom_line(aes(y = D), colour="black" )+ geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) + ylab(varname[i]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()
+#Dout = cbind(Dout, data)
  }
  marrangeGrob(plots[1:2], nrow = 1, ncol = 2, top = NULL)
 
@@ -470,23 +469,25 @@ setwd('/Users/bomin8319/Desktop/UDU')
 years = c(1983:2014)
 
 Xstar = matrix(0, nrow = N, ncol = 2)
-rownames(Xstar) = sort(rownames(UN$U[[Time]]))
+rownames(Xstar) = rownames(UN$U[[Time]])
 rownames(Xstar)[which(rownames(Xstar) == "GFR")] = "GMY"
-Xstar[94, ]= c(0,1)
-Xstar[48, ] = c(1,0)
+#Xstar[94, ]= c(0,1)
+#Xstar[48, ] = c(1,0)
+Xstar[1, ]= c(0,1)
+Xstar[90, ] = c(1,0)
 #Xstar[19, ] = c(0, -1)
 ##Xstar[20, ] = c(0.5, 0.5)
 #Xstar[11, ] = c(1, 0)
 #Xstar[16,] =c(0.5, 1)
 plots= list()
 data2 = list()
-colors = sort(rownames(Xstar))
+colors = rownames(Xstar)
 for (t in 1:Time) {
 UDmat = matrix(NA, N, 2)
 rownames(UDmat) = colors
 rownames(UN$U[[t]])[which(rownames(UN$U[[t]]) == "GFR")] = "GMY"
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * UN$D[[t]][1] 
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * UN$D[[t]][2]
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * sqrt(UN$D[[t]][1]) 
+UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * sqrt(abs(UN$D[[t]][2]))
 UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),] = procrustes(UDmat[which(rownames(UDmat) %in% rownames(UN$U[[t]])),], Xstar[which(rownames(Xstar) %in% rownames(UN$U[[t]])),])$X.new
 #UDmat = UDmat - UDmat[which(rownames(UDmat) =="USA"),]
 data2[[t]] = data.frame(UDmat)
@@ -499,24 +500,48 @@ Xstar[is.na(Xstar)] = rep(0, 2)
 
 for (t in 1:Time) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))
+p <- ggplot(data2[[t]], aes(x = r1, y = r2, label = rownames(data2[[t]])))
 
-plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+plots[[t]] = p+ geom_text(colour = "black", size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+
+	if (UN$D[[t]][2] < 0) {
+		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
+	}
+
 mname = paste0("plot", t, "full.png")
-print(plots[[t]])
-ggsave(filename = mname)
+#print(plots[[t]])
+#ggsave(filename = mname)
 }
 
 #rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
 #rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
 for (t in c(4,8,12,16,20,24,28,Time)) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
+p <- ggplot(data2[[t]], aes(x = r1, y = r2, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
 
 
-plots[[t]] = p+ geom_text(size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+plots[[t]] = p+ geom_text(colour = "black", size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+	if (UN$D[[t]][2] < 0) {
+		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
+	}
 }
 marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)], nrow = 2, ncol = 4, top = NULL)
+
+
+for (t in c(4,8,12,16,20,24,28,Time)-2) {
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data2[[t]], aes(x = r1, y = r2, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
+
+
+plots[[t]] = p+ geom_text(colour = "black", size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+	if (UN$D[[t]][2] < 0) {
+		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
+	}
+}
+marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)-2], nrow = 2, ncol = 4, top = NULL)
+
 
 #UD plots_reduced
 data3 = list()
@@ -524,15 +549,18 @@ for (t in 1:Time) {
     data3[[t]] = data2[[t]][rownames(data2[[t]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]
 }
 plots= list()
-colors = sort(rownames(data3[[1]]))
+colors = rownames(data3[[1]])
 for (t in 1:Time) {
     colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-    p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]])))
+    p <- ggplot(data3[[t]], aes(x = r1, y = r2,  label = rownames(data3[[t]])))
     
-    plots[[t]] = p+ geom_text(size = 5, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+    plots[[t]] = p+ geom_text(colour = "black", size = 5, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+    if (UN$D[[t]][2] < 0) {
+		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
+	}
     mname = paste0("plot", t, "reduced.png")
-    print(plots[[t]])
-   ggsave(filename = mname)
+   # print(plots[[t]])
+   #ggsave(filename = mname)
 }
 
 
@@ -541,12 +569,29 @@ for (t in 1:Time) {
 #rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
 for (t in c(4,8,12,16,20,24,28,Time)) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")
+p <- ggplot(data3[[t]], aes(x = r1, y = r2, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")
 
-plots[[t]] = p+ geom_text(size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+plots[[t]] = p+ geom_text(colour = "black", size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+  if (UN$D[[t]][2] < 0) {
+		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
+	}
+
 }
 marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)], nrow = 2, ncol = 4, top = NULL)
 
+for (t in c(4,8,12,16,20,24,28,Time)-2) {
+colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
+p <- ggplot(data3[[t]], aes(x = r1, y = r2, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")
+
+plots[[t]] = p+ geom_text(colour = "black", size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
+  if (UN$D[[t]][2] < 0) {
+		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
+	}
+
+}
+marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
+marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)-2], nrow = 2, ncol = 4, top = NULL)
 
 ###############################
 #updated negative D version
@@ -717,68 +762,69 @@ datacollapse = matrix(0, nrow = 84000, ncol = 3)
 observedcollapse = matrix(0, 28, 3)
 pp = list()
 for (tp in 1:Time) {
-	diag(Y[tp,,]) = 0
-	Y[tp, which(avail1[tp, ]==0), ] = 0
-	Y[tp, , which(avail1[tp, ]==0)] = 0
-	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-		data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
-	colnames(data) =  c(60:87)
-	datamat = matrix(0, 1000, 28)
-	colnames(datamat) = c(60:87)
-	for (i in 1:1000) {
-		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	}
-	datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
-
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN4$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
-	colnames(data) =  c(60:87)
-	datamat = matrix(0, 1000, 28)
-	 colnames(datamat) = c(60:87)
-	 for (i in 1:1000) {
-		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	 }
-	 datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
-		
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN2$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
-	 colnames(data) =  c(60:87)
-	 datamat = matrix(0, 1000,28)
-	 colnames(datamat) = c(60:87)
-		 for (i in 1:1000) {
-		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	}
-	 datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
-	
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
-	 colnames(data) =  c(60:87)
-	 datamat = matrix(0, 1000, 28)
-	 colnames(datamat) =c(60:87)
-		 for (i in 1:1000) {
-		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	}
-	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
-	datamat4 = datamat3
-	datamat4 = as.data.frame(datamat4)
-	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,])), 95) / sum(tabulate(round(rowSums(Y[tp,,])), 95)))[-c(1:59, 88:95)]
-	names(observedpp) = c(60:87)
-	pvec = rep(0, 28)
-	names(pvec) =c(60:87)
-	pvec[which(names(pvec) %in% names(observedpp))] = observedpp
-	observed = data.frame(Proportion = pvec, Degree = as.factor(c(60:87)), Model = "DAME")
-	pp[[tp]] = ggplot(datamat4, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-    datacollapse[,1] = datacollapse[,1] + datamat3[,1]
-    observedcollapse[,1] = observedcollapse[,1] + observed[,1]
+  diag(Y[tp,,]) = 0
+  Y[tp, which(avail1[tp, ]==0), ] = 0
+  Y[tp, , which(avail1[tp, ]==0)] = 0
+  Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
+  data = t(sapply(1:1000, function(r){tabulate(round(UN$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
+  colnames(data) =  c(60:87)
+  datamat = matrix(0, 1000, 28)
+  colnames(datamat) = c(60:87)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat1 = data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN4$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
+  colnames(data) =  c(60:87)
+  datamat = matrix(0, 1000, 28)
+  colnames(datamat) = c(60:87)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN2$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
+  colnames(data) =  c(60:87)
+  datamat = matrix(0, 1000,28)
+  colnames(datamat) = c(60:87)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN3$Degree[[tp]][r,]/100), 95)}))[,-c(1:59, 88:95)]
+  colnames(data) =  c(60:87)
+  datamat = matrix(0, 1000, 28)
+  colnames(datamat) =c(60:87)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), Degree = factor(c(sapply(c(60:87), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
+  datamat4 = datamat3
+  datamat4 = as.data.frame(datamat4)
+  observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,])), 95) / sum(tabulate(round(rowSums(Y[tp,,])), 95)))[-c(1:59, 88:95)]
+  names(observedpp) = c(60:87)
+  pvec = rep(0, 28)
+  names(pvec) =c(60:87)
+  pvec[which(names(pvec) %in% names(observedpp))] = observedpp
+  datamat4$Degree = as.factor(as.numeric(as.character(datamat4$Degree))*100)
+  observed = data.frame(Proportion = pvec, Degree = as.factor(c(60:87)*100), Model = "DAME")
+  pp[[tp]] = ggplot(datamat4, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+  datacollapse[,1] = datacollapse[,1] + datamat3[,1]
+  observedcollapse[,1] = observedcollapse[,1] + observed[,1]
 }
 years = c(1983:2014)
 for (t in 1:Time){
-mname = paste0(years[t], "overalldegree", ".png")
-print(pp[[t]])
-ggsave(filename = mname, width = 10, height = 6)
+  mname = paste0(years[t], "overalldegree", ".png")
+#  print(pp[[t]])
+#  ggsave(filename = mname, width = 11, height = 6)
 }
-datacollapse = data.frame(Proportion = datacollapse[,1]/Time, Degree = datamat3$Degree, Model = datamat3$Model)
+datacollapse = data.frame(Proportion = datacollapse[,1]/Time, Degree = as.factor(as.numeric(as.character(datamat3$Degree))*100), Model = datamat3$Model)
 observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, Degree = observed$Degree, Model = observed$Model)
 datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
 pp = ggplot(datacollapse, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-#pp = ggplot(datacollapse2, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+#pp = ggplot(datacollapse2, aes(x = Degree, y = Proportion)) + geom_boxplot(colour = "black",outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
 pp
 
 
@@ -788,70 +834,78 @@ datacollapse = matrix(0, nrow = 2*37500, ncol = 3)
 observedcollapse = matrix(0, 25, 3)
 pp = list()
 for (tp in 1:Time) {
-	diag(Y[tp,,]) = 0
-	Y[tp, which(avail1[tp, ]==0), ] = 0
-	Y[tp, , which(avail1[tp, ]==0)] = 0
-	Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-	data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
-	colnames(data) =  c(45:69)
-	datamat = matrix(0, 1000, 25)
-	colnames(datamat) = c(45:69)
-	for (i in 1:1000) {
-		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	}
-	datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
-
-	data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
-	colnames(data) =  c(45:69)
-	datamat = matrix(0, 1000, 25)
-	colnames(datamat) = c(45:69)
-	for (i in 1:1000) {
-		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	}
-	datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
-		
-	data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
-	colnames(data) = c(45:69)
-	datamat = matrix(0, 1000, 25)
-	colnames(datamat) = c(45:69)
-		for (i in 1:1000) {
-		datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	}
-	datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
-	
-	 data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
- colnames(data) =  c(45:69)
-	datamat = matrix(0, 1000, 25)
-	colnames(datamat) =c(45:69)
-		 for (i in 1:1000) {
-		 datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-	}
-	 datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
-	datamat4 = datamat3
-	datamat4 = as.data.frame(datamat4)
-	observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/(N))), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]
-	names(observedpp) = c(45:69)
-	pvec = rep(0,25)
-	names(pvec) =c(45:69)
-	pvec[which(names(pvec) %in% names(observedpp))] = observedpp
-	observed = data.frame(Proportion = pvec, secondDegree = as.factor(c(45:69)), Model = "DAME")
-	pp[[tp]] = ggplot(datamat4, aes(x = secondDegree, y = Proportion,fill = Model, color = Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-    datacollapse[,1] = datacollapse[,1] + datamat4[,1]
-    observedcollapse[,1] = observedcollapse[,1] + observed[,1]
+  diag(Y[tp,,]) = 0
+  Y[tp, which(avail1[tp, ]==0), ] = 0
+  Y[tp, , which(avail1[tp, ]==0)] = 0
+  Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
+  data = t(sapply(1:1000, function(r){tabulate(round(UN$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
+  colnames(data) =  c(45:69)
+  datamat = matrix(0, 1000, 25)
+  colnames(datamat) = c(45:69)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat1 = data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN4$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
+  colnames(data) =  c(45:69)
+  datamat = matrix(0, 1000, 25)
+  colnames(datamat) = c(45:69)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN2$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
+  colnames(data) = c(45:69)
+  datamat = matrix(0, 1000, 25)
+  colnames(datamat) = c(45:69)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN3$secondDegree[[tp]][r,]/(N*10000)), 77)}))[,-c(1:44, 70:77)]
+  colnames(data) =  c(45:69)
+  datamat = matrix(0, 1000, 25)
+  colnames(datamat) =c(45:69)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), secondDegree = factor(c(sapply(c(45:69), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
+  datamat4 = datamat3
+  datamat4 = as.data.frame(datamat4)
+  datamat4$secondDegree = as.factor(as.numeric(as.character(datamat4$secondDegree))*10000)
+  observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]/(N))), 77) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,] /N)), 77)))[-c(1:44, 70:77)]
+  names(observedpp) = c(45:69)
+  pvec = rep(0,25)
+  names(pvec) =c(45:69)
+  pvec[which(names(pvec) %in% names(observedpp))] = observedpp
+  observed = data.frame(Proportion = pvec, secondDegree = as.factor(c(45:69)*10000), Model = "DAME")
+  datamat4$secondDegree =as.factor(paste0(substr(datamat4$secondDegree, 1, 3), ""))
+  observed$secondDegree =as.factor(paste0(substr(observed$secondDegree, 1, 3), ""))
+  pp[[tp]] = ggplot(datamat4, aes(x = secondDegree, y = Proportion,fill = Model, color = Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+  datacollapse[,1] = datacollapse[,1] + datamat4[,1]
+  observedcollapse[,1] = observedcollapse[,1] + observed[,1]
 }
 
 for (t in 1:Time){
-mname = paste0(years[t], "overallseconddegree", ".png")
-print(pp[[t]])
-ggsave(filename = mname, width = 10, height = 6)
+  mname = paste0(years[t], "overallseconddegree", ".png")
+#  print(pp[[t]]+labs(x = "secondDegree (in thousand)"))
+#  ggsave(filename = mname, width = 11, height = 6)
 }
 
-datacollapse = data.frame(Proportion = datacollapse[,1]/Time, secondDegree = datamat3$secondDegree, Model = datamat3$Model)
+datacollapse = data.frame(Proportion = datacollapse[,1]/Time, secondDegree = as.factor(as.numeric(as.character(datamat3$secondDegree))*10000), Model = datamat3$Model)
 observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, secondDegree = observed$secondDegree, Model = observed$Model)
 datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
+datacollapse$secondDegree =as.factor(paste0(substr(datacollapse$secondDegree, 1, 3), ""))
+datacollapse2$secondDegree =as.factor(paste0(substr(datacollapse2$secondDegree, 1, 3), ""))
+observedcollapse$secondDegree =as.factor(paste0(substr(observedcollapse$secondDegree, 1, 3), ""))
 pp = ggplot(datacollapse, aes(x = secondDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-#pp = ggplot(datacollapse2, aes(x = secondDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-pp
+#pp = ggplot(datacollapse2, aes(x = secondDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+pp + labs(x = "secondDegree (in thousand)")
+
+
 
 
 #thirddegree
@@ -861,70 +915,86 @@ observedcollapse = matrix(0, 27, 3)
 
 pp = list()
 for (tp in 1:Time) {
-    diag(Y[tp,,]) = 0
-    Y[tp, which(avail1[tp, ]==0), ] = 0
-    Y[tp, , which(avail1[tp, ]==0)] = 0
-    Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
-    data = t(sapply(1:1000, function(r){tabulate(round(UN$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
-    colnames(data) = c(32:58)
-    datamat = matrix(0, 1000, 27)
-    colnames(datamat) = c(32:58)
-    for (i in 1:1000) {
-        datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-    }
-    datamat1 = data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
-    
-    data =  t(sapply(1:1000, function(r){tabulate(round(UN4$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
-    colnames(data) =  c(32:58)
-    datamat = matrix(0, 1000, 27)
-    colnames(datamat) = c(32:58)
-    for (i in 1:1000) {
-        datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-    }
-    datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
-    
-    data =  t(sapply(1:1000, function(r){tabulate(round(UN2$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
-    colnames(data) = c(32:58)
-    datamat = matrix(0, 1000, 27)
-    colnames(datamat) = c(32:58)
-    for (i in 1:1000) {
-        datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-    }
-    datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
-    
-     data =  t(sapply(1:1000, function(r){tabulate(round(UN3$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
-    colnames(data) =  c(32:58)
-    datamat = matrix(0, 1000, 27)
-     colnames(datamat) =c(32:58)
-     for (i in 1:1000) {
+  diag(Y[tp,,]) = 0
+  Y[tp, which(avail1[tp, ]==0), ] = 0
+  Y[tp, , which(avail1[tp, ]==0)] = 0
+  Y[tp, , ][which(is.na(Y[tp, , ]))] = 0
+  data = t(sapply(1:1000, function(r){tabulate(round(UN$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
+  colnames(data) = c(32:58)
+  datamat = matrix(0, 1000, 27)
+  colnames(datamat) = c(32:58)
+  for (i in 1:1000) {
     datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
-     }
-    datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
-    datamat4 = datamat3
-    datamat4 = as.data.frame(datamat4)
-    observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]%*% Y[tp,,]/(N*N))), 66) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,]%*% Y[tp,,] /(N*N))), 66)))[-c(1:31, 59:66)]
-    names(observedpp) = c(32:58)
-    pvec = rep(0, 27)
-    names(pvec) =c(32:58)
-    pvec[which(names(pvec) %in% names(observedpp))] = observedpp
-    observed = data.frame(Proportion = pvec, thirdDegree = as.factor(c(32:58)), Model = "DAME")
-    pp[[tp]] = ggplot(datamat4, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-    datacollapse[,1] = datacollapse[,1] + datamat4[,1]
-    observedcollapse[,1] = observedcollapse[,1] + observed[,1]
+  }
+  datamat1 = data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("DAME"))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN4$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
+  colnames(data) =  c(32:58)
+  datamat = matrix(0, 1000, 27)
+  colnames(datamat) = c(32:58)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat2 = rbind(datamat1, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("ME")))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN2$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
+  colnames(data) = c(32:58)
+  datamat = matrix(0, 1000, 27)
+  colnames(datamat) = c(32:58)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat3 = rbind(datamat2, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("AE")))
+  
+  data =  t(sapply(1:1000, function(r){tabulate(round(UN3$thirdDegree[[tp]][r,]/(N*N*1000000)), 66)}))[,-c(1:31, 59:66)]
+  colnames(data) =  c(32:58)
+  datamat = matrix(0, 1000, 27)
+  colnames(datamat) =c(32:58)
+  for (i in 1:1000) {
+    datamat[i, which(colnames(datamat) %in% colnames(data))] = data[i,] / sum(data[i,])
+  }
+  datamat4 = rbind(datamat3, data.frame(Proportion = c(datamat), thirdDegree = factor(c(sapply(c(32:58), function(k){rep(k, 1000)}))), Model = as.factor("NO")))
+  datamat4 = datamat3
+  datamat4 = as.data.frame(datamat4)
+  datamat4$thirdDegree = as.factor(as.numeric(as.character(datamat4$thirdDegree))*1000000)
+  observedpp = as.numeric(tabulate(round(rowSums(Y[tp,,]%*% Y[tp,,]%*% Y[tp,,]/(N*N))), 66) / sum(tabulate(round(rowSums(Y[tp,,] %*% Y[tp,,]%*% Y[tp,,] /(N*N))), 66)))[-c(1:31, 59:66)]
+  names(observedpp) = c(32:58)
+  pvec = rep(0, 27)
+  names(pvec) =c(32:58)
+  pvec[which(names(pvec) %in% names(observedpp))] = observedpp
+  observed = data.frame(Proportion = pvec, thirdDegree = as.factor(c(32:58)*1000000), Model = "DAME")
+  datamat4$thirdDegree =as.factor(paste0(substr(datamat4$thirdDegree, 1, 3), ""))
+  observed$thirdDegree =as.factor(paste0(substr(observed$thirdDegree, 1, 3), ""))
+  
+  pp[[tp]] = ggplot(datamat4, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observed, color = "blue", size = 0.2, group = 1)+geom_point(data =observed, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+  datacollapse[,1] = datacollapse[,1] + datamat4[,1]
+  observedcollapse[,1] = observedcollapse[,1] + observed[,1]
 }
 years = c(1983:2014)
 for (t in 1:Time){
-    mname = paste0(years[t], "overallthirddegree", ".png")
-    print(pp[[t]])
-    ggsave(filename = mname, width = 10, height = 6)
+  mname = paste0(years[t], "overallthirddegree", ".png")
+ # print(pp[[t]]+labs(x = "thirdDegree (in million)"))
+#  ggsave(filename = mname, width = 11, height = 6)
 }
+
+datacollapse = data.frame(Proportion = datacollapse[,1]/Time, thirdDegree =as.factor(as.numeric(as.character(datamat3$thirdDegree))*1000000), Model = datamat3$Model)
+datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
+observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, thirdDegree = observed$thirdDegree, Model = observed$Model)
+datacollapse$thirdDegree =as.factor(paste0(substr(datacollapse$thirdDegree, 1, 3), ""))
+datacollapse2$thirdDegree =as.factor(paste0(substr(datacollapse2$thirdDegree, 1, 3), ""))
+observedcollapse$thirdDegree =as.factor(paste0(substr(observedcollapse$thirdDegree, 1, 3), ""))
+pp = ggplot(datacollapse, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+#pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+pp+labs(x = "thirdDegree (in million)")
+
+
 
 
 datacollapse = data.frame(Proportion = datacollapse[,1]/Time, thirdDegree = datamat3$thirdDegree, Model = datamat3$Model)
 observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, thirdDegree = observed$thirdDegree, Model = observed$Model)
 pp = ggplot(datacollapse, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
 datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
-#pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+#pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha("black", 0.2)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank()) + xlab("thirdDegree (in million)")
 pp
 
 
