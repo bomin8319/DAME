@@ -2,7 +2,7 @@
 rm(list=ls())
 load('~/Desktop/DAME_revised/UNdatafull.RData')
 attach(UNdatafull)
-source('~/Desktop/DAME_revised/DAME_pkg_revised/R/DAME.R', chdir = TRUE)
+source('~/Desktop/DAME_revised/code/DAME.R', chdir = TRUE)
 library(FastGP)
 library(mvtnorm)
 library(fields)

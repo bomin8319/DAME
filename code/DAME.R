@@ -762,7 +762,7 @@ DAME_MH_revised = function(Y, X, RE = c("additive", "multiplicative"), R = 2, di
       }
     }
     if ("multiplicative" %in% RE) {
-    	if (iter < burn) { prop = 0.1 } else { prop = c(0.01, 0.05) }
+    	if (iter < burn) { prop = 0.1 } else { prop = 0.01 }
       if (iter > 0.1 * burn) {
         #M-H of kappa_r
         for (r in 1:R) {

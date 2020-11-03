@@ -1,7 +1,0 @@
-rm(list=ls())#
-#
-#################################
-#simulation 1#
-library(devtools)#
-setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/DAME_pkg_revised/R')#
-load_all()
