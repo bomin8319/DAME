@@ -1,10 +1,8 @@
 #full
 rm(list=ls())
-library(devtools)
-setwd('/Users/bomin8319/Desktop/DAME_revised/DAME_pkg_revised/R')
-#load_all()
-load("/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised/UNdatafull.RData")
+load('~/Desktop/DAME_revised/UNdatafull.RData')
 attach(UNdatafull)
+source('~/Desktop/DAME_revised/DAME_pkg_revised/R/DAME.R', chdir = TRUE)
 library(FastGP)
 library(mvtnorm)
 library(fields)
@@ -37,46 +35,17 @@ avail1[13:21, which(colnames(avail1) %in% c("IRQ"))] = 0 #IRQ under sanction
 
 Degrees = vapply(1:Time, function(tp) {rowSums(Y[tp,,], na.rm = TRUE)}, rep(0, N))
 corr = vapply(1:31, function(l) {cor(Degrees[1:(N*(Time - l))], Degrees[(1 + N*l):(N*Time)], use = "complete")}, 0)
-#Degrees_nofixed = vapply(1:Time, function(tp) {rowSums(E[[tp]], na.rm = TRUE)}, rep(0, N))
-#corr_nofixed = vapply(1:31, function(l) {cor(Degrees_nofixed[1:(N*(Time - l))], Degrees_nofixed[(1 + N*l):(N*Time)], use = "complete")}, 0)
 
-setwd('/Users/bomin8319/Desktop/DAME_revision/DAME_code_revised')
-set.seed(1)
-UN = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
-save(UN, file = "/Users/bomin8319/Desktop/UN_full1.RData")
-UN2 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("additive"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
-save(UN2, file = "/Users/bomin8319/Desktop/UN_full2.RData")
-UN3 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
-save(UN3, file = "/Users/bomin8319/Desktop/UN_full3.RData")
-UN4 = DAME_MH_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
-save(UN4, file = "/Users/bomin8319/Desktop/UN_full4.RData")
-#save(UN2, file = "UN_full2.RData")
-#save(UN3, file = "UN_full3.RData")
-#save(UN4, file = "/Users/bomin8319/Desktop/UN_full4.RData")
-
-UN5 = DAME_UU_fixed_revised(Y[1:Time,,], X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(10, 6+1+2))
-#save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
 #################
 
 UN = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("additive", "multiplicative"), R = 2, avail = avail1, burn = 50000, nscan = 100000, odens = 50)
-save(UN, file = "/Users/bomin8319/Desktop/UN_full_long.RData")
+#save(UN, file = "/Users/bomin8319/Desktop/UN_full_long.RData")
 UN2 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("additive"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
-save(UN2, file = "/Users/bomin8319/Desktop/UN_full2.RData")
+#save(UN2, file = "/Users/bomin8319/Desktop/UN_full2.RData")
 UN3 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c(), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50)
-save(UN3, file = "/Users/bomin8319/Desktop/UN_full3.RData")
+#save(UN3, file = "/Users/bomin8319/Desktop/UN_full3.RData")
 UN5 = DAME_UU_fixed_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 20000, nscan = 50000, odens = 50, kappas = rep(10, 6+1+2))
-save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
-
-
-UN5 = DAME_UU_fixed_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 2000, nscan = 5000, odens = 10, kappas = rep(10, 6+1+2))
-UN6 = DAME_MH_revised(Y[1:Time,,]*100, X[1:Time,,,1:6], RE = c("multiplicative"), R = 2, avail = avail1, burn = 2000, nscan = 5000, odens = 10)
-#####################
-load('~/Desktop/UN_full1.RData⁩') #DAME
-#load("/Users/bomin8319/Desktop/UN_full5.RData") #AE
-#UN2 = UN5
-load('~/Desktop/DAME_revision/UN_full2.RData⁩') #fixed only
-load('~/Desktop/DAME_revision/UN_full3.RData⁩') #fixed only
-#load('~/Desktop/UN_full4.RData⁩') #multicative only using DAME
+#save(UN5, file = "/Users/bomin8319/Desktop/UN_full5.RData")
 UN4 = UN5
 
 #########summary of results#######
@@ -160,10 +129,6 @@ for (n in 1:N){
   print(p10[[n]])
   ggsave(filename = mname, width = 12, height = 6)
 }
-
-
-
-
 
 
 #secondDegree
@@ -345,29 +310,6 @@ data = data.frame(cbind(years,t(betas[[i]])))
  }
  marrangeGrob(plots[1:6], nrow = 2, ncol = 3, top = NULL)
 
-#D plots
-#Dout = matrix(NA, nrow = 32, ncol = 0)
-#D = lapply(1:Time, function(t){summary(mcmc(UN$DPS[[t]][200:500,]))[[2]]})
-#Ds = list()
-#for (i in 1:2) {Ds[[i]] = sapply(1:Time, function(t){D[[t]][i,]})}
-#betacols= ggplotColours(2)
-#plots = list()
-#years = c(1983:2014)
-#data = data.frame(cbind(years,t(Ds[[i]])))
-# colnames(data)[4] = "D"
-# f = ggplot(data, aes(x = years))
-#varname = c("D_1", "D_2")
-#for (i in 1:2){
-#years = c(1983:2014)
-#data = data.frame(cbind(years,t(Ds[[i]])))
-# colnames(data)[4] = "D"
-# f = ggplot(data, aes(x = years))
-# 
-# plots[[i]] <- f + geom_line(aes(y = D), colour=color[i]) + geom_ribbon(aes(ymin = X2.5., ymax = X97.5.), alpha = 0.1) +ylab(varname[i]) + scale_x_continuous(breaks=number_ticks(8)) + geom_hline(yintercept = 0) + theme_minimal()
-#Dout = cbind(Dout, data)
-# }
-# marrangeGrob(plots[1:2], nrow = 1, ncol = 2, top = NULL)
-
 #D plots UPDATED
   meaningful_NA_rows = lapply(1:Time, function(tp) {
     which(avail1[tp,]==0)
@@ -471,14 +413,8 @@ years = c(1983:2014)
 Xstar = matrix(0, nrow = N, ncol = 2)
 rownames(Xstar) = rownames(UN$U[[Time]])
 rownames(Xstar)[which(rownames(Xstar) == "GFR")] = "GMY"
-#Xstar[94, ]= c(0,1)
-#Xstar[48, ] = c(1,0)
 Xstar[1, ]= c(0,1)
 Xstar[90, ] = c(1,0)
-#Xstar[19, ] = c(0, -1)
-##Xstar[20, ] = c(0.5, 0.5)
-#Xstar[11, ] = c(1, 0)
-#Xstar[16,] =c(0.5, 1)
 plots= list()
 data2 = list()
 colors = rownames(Xstar)
@@ -489,14 +425,11 @@ rownames(UN$U[[t]])[which(rownames(UN$U[[t]]) == "GFR")] = "GMY"
 UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * sqrt(UN$D[[t]][1]) 
 UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * sqrt(abs(UN$D[[t]][2]))
 UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),] = procrustes(UDmat[which(rownames(UDmat) %in% rownames(UN$U[[t]])),], Xstar[which(rownames(Xstar) %in% rownames(UN$U[[t]])),])$X.new
-#UDmat = UDmat - UDmat[which(rownames(UDmat) =="USA"),]
 data2[[t]] = data.frame(UDmat)
 colnames(data2[[t]])[1:2] = c("r1", "r2")
 Xstar = UDmat
 Xstar[is.na(Xstar)] = rep(0, 2)
 }
-#rangex = summary(unlist(sapply(1:Time, function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
-#rangey = summary(unlist(sapply(1:Time, function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
 
 for (t in 1:Time) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
@@ -509,37 +442,19 @@ plots[[t]] = p+ geom_text(colour = "black", size = 5, show.legend = F, check_ove
 	}
 
 mname = paste0("plot", t, "full.png")
-#print(plots[[t]])
-#ggsave(filename = mname)
+print(plots[[t]])
+ggsave(filename = mname)
 }
-
-#rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
-#rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-for (t in c(4,8,12,16,20,24,28,Time)) {
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data2[[t]], aes(x = r1, y = r2, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
-
-
-plots[[t]] = p+ geom_text(colour = "black", size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
-	if (UN$D[[t]][2] < 0) {
-		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
-	}
-}
-marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
-marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)], nrow = 2, ncol = 4, top = NULL)
-
 
 for (t in c(4,8,12,16,20,24,28,Time)-2) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
 p <- ggplot(data2[[t]], aes(x = r1, y = r2, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
 
-
 plots[[t]] = p+ geom_text(colour = "black", size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
 	if (UN$D[[t]][2] < 0) {
 		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
 	}
 }
-marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
 marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)-2], nrow = 2, ncol = 4, top = NULL)
 
 
@@ -559,26 +474,9 @@ for (t in 1:Time) {
 		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
 	}
     mname = paste0("plot", t, "reduced.png")
-   # print(plots[[t]])
-   #ggsave(filename = mname)
+   print(plots[[t]])
+   ggsave(filename = mname)
 }
-
-
-
-#rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
-#rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-for (t in c(4,8,12,16,20,24,28,Time)) {
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data3[[t]], aes(x = r1, y = r2, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")
-
-plots[[t]] = p+ geom_text(colour = "black", size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
-  if (UN$D[[t]][2] < 0) {
-		plots[[t]] = plots[[t]] + geom_vline(colour = 'red', aes(xintercept = 0))
-	}
-
-}
-marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
-marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)], nrow = 2, ncol = 4, top = NULL)
 
 for (t in c(4,8,12,16,20,24,28,Time)-2) {
 colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
@@ -590,167 +488,8 @@ plots[[t]] = p+ geom_text(colour = "black", size = 3, show.legend = F)+ ggtitle(
 	}
 
 }
-marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
 marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)-2], nrow = 2, ncol = 4, top = NULL)
 
-###############################
-#updated negative D version
-###############################
-#UD plots_full
-setwd('/Users/bomin8319/Desktop/UDU')
-years = c(1983:2014)
-Xstar_all = list()
-Xstar = matrix(0, nrow = N, ncol = 2)
-#rownames(Xstar) = sort(rownames(UN$U[[Time]]))
-rownames(Xstar) = rownames(UN$U[[Time]])
-rownames(Xstar)[which(rownames(Xstar) == "GFR")] = "GMY"
-#Xstar[94, ]= c(0,1)
-#Xstar[48, ] = c(1,0)
-Xstar[1, ]= c(0,1)
-Xstar[90, ] = c(1,0)
-#Xstar[19, ] = c(0, -1)
-##Xstar[20, ] = c(0.5, 0.5)
-#Xstar[11, ] = c(1, 0)
-#Xstar[16,] =c(0.5, 1)
-plots= list()
-data2 = list()
-#colors = sort(rownames(Xstar))
-colors = rownames(Xstar)
-for (t in c(1:Time)[-c(14, 16, 17)]) {
-UDmat = matrix(NA, N, 2)
-rownames(UDmat) = colors
-rownames(UN$U[[t]])[which(rownames(UN$U[[t]]) == "GFR")] = "GMY"
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * sqrt(UN$D[[t]][1]) 
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * sqrt(UN$D[[t]][2])
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),] = procrustes(UDmat[which(rownames(UDmat) %in% rownames(UN$U[[t]])),], Xstar[which(rownames(Xstar) %in% rownames(UN$U[[t]])),])$X.new
-#UDmat = UDmat - UDmat[which(rownames(UDmat) =="USA"),]
-data2[[t]] = data.frame(UDmat)
-colnames(data2[[t]])[1:2] = c("r1", "r2")
-Xstar = UDmat
-Xstar[is.na(Xstar)] = rep(0, 2)
-Xstar_all[[t]] = Xstar
-}
-#rangex = summary(unlist(sapply(1:Time, function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
-#rangey = summary(unlist(sapply(1:Time, function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-
-for (t in c(1:Time)[-c(14, 16, 17)]) {
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))
-
-plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
-mname = paste0("plot", t, "full.png")
-print(plots[[t]])
-ggsave(filename = mname)
-}
-
-######circleplot
-
-for (t in c(1:Time)[c(14, 16, 17)]) {
-	Xstar = Xstar_all[[t-1]]
-	if (t!= 17) {
-	Xstar = cbind(Xstar, -Xstar[,2])
-	}
-UDmat = matrix(NA, N, 3)
-rownames(UDmat) = colors
-rownames(UN$U[[t]])[which(rownames(UN$U[[t]]) == "GFR")] = "GMY"
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,1] * UN$D[[t]][1] )),1] =  UN$U[[t]][,1] * sqrt(UN$D[[t]][1]) 
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),2] =  UN$U[[t]][,2] * sqrt(abs(UN$D[[t]][2]))
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),3] =  -UN$U[[t]][,2] * sqrt(abs(UN$D[[t]][2]))
-
-UDmat[which(rownames(UDmat) %in% names(UN$U[[t]][,2] * UN$D[[t]][2] )),] = procrustes(UDmat[which(rownames(UDmat) %in% rownames(UN$U[[t]])),], Xstar[which(rownames(Xstar) %in% rownames(UN$U[[t]])),])$X.new
-#UDmat = UDmat - UDmat[which(rownames(UDmat) =="USA"),]
-data2[[t]] = data.frame(UDmat)
-colnames(data2[[t]])[1:3] = c("r1", "r2", "r3")
-Xstar = UDmat
-Xstar[is.na(Xstar)] = rep(0, 3)
-Xstar_all[[t]] = Xstar
-}
-#rangex = summary(unlist(sapply(1:Time, function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
-#rangey = summary(unlist(sapply(1:Time, function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-
-for (t in c(1:Time)[c(14, 16, 17)]) {
-	data3 = melt(data2[[t]], id.vars = "r1")
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data3, aes(x = r1, y = value, colour = variable, label = rep(rownames(data2[[t]]),2)))
-
-plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) 
-
-mname = paste0("plot", t, "full.png")
-print(plots[[t]])
-ggsave(filename = mname)
-}
-#############################
-
-
-#rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
-#rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-for (t in c(4,8,12,20,24,28,Time)) {
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data2[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data2[[t]])))+ labs(x = "r = 1", y = "r = 2")
-plots[[t]] = p+ geom_text(size = 2, show.legend = F, check_overlap =FALSE)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
-}
-t = 16
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-	data3 = melt(data2[[t]], id.vars = "r1")
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data3, aes(x = r1, y = value, colour = variable, label = rep(rownames(data2[[t]]),2)))
-
-plots[[t]] = p+ geom_text(size = 2, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) + labs(x = "r = 1", y = "r = 2")
-
-
-marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
-
-
-#UD plots_reduced
-data3 = list()
-for (t in c(1:Time)[-c(14, 16, 17)]) {
-    data3[[t]] = data2[[t]][rownames(data2[[t]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]
-}
-plots= list()
-colors = rownames(data3[[1]])
-for (t in 1:Time) {
-    colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-    p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]])))
-    
-    plots[[t]] = p+ geom_text(size = 5, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
-    mname = paste0("plot", t, "reduced.png")
-    print(plots[[t]])
-   ggsave(filename = mname)
-}
-for (t in c(1:Time)[c(14, 16, 17)]) {
-	  data3[[t]] = data2[[t]][rownames(data2[[t]]) %in% c("USA", "CHN", "IND", "ROK","PRK","IRQ","RUS","GRG","UKR","UKG", "FRN", "GMY", "TUR", "JPN", "ISR", "SYR", "LEB", "SUD", "IRN", "AUL", "PAK", "EGY","AFG"),]
-	data4 = melt(data3[[t]], id.vars = "r1")
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data4, aes(x = r1, y = value, colour = variable, label = rep(rownames(data3[[t]]),2)))
-
-plots[[t]] = p+ geom_text(size = 5, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) 
-
-mname = paste0("plot", t, "reduced.png")
-print(plots[[t]])
-ggsave(filename = mname)
-}
-#############################
-
-
-
-#rangex = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,1][!is.na(data2[[t]][,1])]})))
-#rangey = summary(unlist(sapply(c(4,8,12,16,20,24,28,Time), function(t){data2[[t]][,2][!is.na(data2[[t]][,2])]})))
-for (t in c(4,8,12,20,24,28,Time)) {
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data3[[t]], aes(x = r1, y = r2, colour = colors, label = rownames(data3[[t]]))) + labs(x = "r = 1", y = "r = 2")
-
-plots[[t]] = p+ geom_text(size = 3, show.legend = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5))  + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3))
-}
-t = 16
-	data4 = melt(data3[[t]], id.vars = "r1")
-colors.t = colors[which(colors %in% rownames(UN$U[[t]]))]
-p <- ggplot(data4, aes(x = r1, y = value, colour = variable, label = rep(rownames(data3[[t]]),2)))
-
-plots[[t]] = p+ geom_text(size = 3, show.legend = F, check_overlap = F)+ ggtitle(years[t]) + theme_minimal()+ theme(plot.title = element_text(hjust = 0.5)) + scale_x_continuous(breaks=number_ticks(3)) + scale_y_continuous(breaks=number_ticks(3)) + labs(x = "r = 1", y = "r = 2")
-
-marrangeGrob(plots[c(4,8,12,16,20,24,28,Time)], nrow = 2, ncol = 4, top = NULL)
-
-marrangeGrob(plots[c(4,20, 8, 24, 12, 28, 16,Time)], nrow = 2, ncol = 4, top = NULL)
 
 
 
@@ -817,14 +556,14 @@ for (tp in 1:Time) {
 years = c(1983:2014)
 for (t in 1:Time){
   mname = paste0(years[t], "overalldegree", ".png")
-#  print(pp[[t]])
-#  ggsave(filename = mname, width = 11, height = 6)
+  print(pp[[t]])
+  ggsave(filename = mname, width = 11, height = 6)
 }
 datacollapse = data.frame(Proportion = datacollapse[,1]/Time, Degree = as.factor(as.numeric(as.character(datamat3$Degree))*100), Model = datamat3$Model)
 observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, Degree = observed$Degree, Model = observed$Model)
 datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
-pp = ggplot(datacollapse, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-#pp = ggplot(datacollapse2, aes(x = Degree, y = Proportion)) + geom_boxplot(colour = "black",outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+#pp = ggplot(datacollapse, aes(x = Degree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+pp = ggplot(datacollapse2, aes(x = Degree, y = Proportion)) + geom_boxplot(colour = "black",outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
 pp
 
 
@@ -891,8 +630,8 @@ for (tp in 1:Time) {
 
 for (t in 1:Time){
   mname = paste0(years[t], "overallseconddegree", ".png")
-#  print(pp[[t]]+labs(x = "secondDegree (in thousand)"))
-#  ggsave(filename = mname, width = 11, height = 6)
+  print(pp[[t]]+labs(x = "secondDegree (in thousand)"))
+  ggsave(filename = mname, width = 11, height = 6)
 }
 
 datacollapse = data.frame(Proportion = datacollapse[,1]/Time, secondDegree = as.factor(as.numeric(as.character(datamat3$secondDegree))*10000), Model = datamat3$Model)
@@ -901,8 +640,8 @@ datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
 datacollapse$secondDegree =as.factor(paste0(substr(datacollapse$secondDegree, 1, 3), ""))
 datacollapse2$secondDegree =as.factor(paste0(substr(datacollapse2$secondDegree, 1, 3), ""))
 observedcollapse$secondDegree =as.factor(paste0(substr(observedcollapse$secondDegree, 1, 3), ""))
-pp = ggplot(datacollapse, aes(x = secondDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-#pp = ggplot(datacollapse2, aes(x = secondDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+#pp = ggplot(datacollapse, aes(x = secondDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+pp = ggplot(datacollapse2, aes(x = secondDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
 pp + labs(x = "secondDegree (in thousand)")
 
 
@@ -973,8 +712,8 @@ for (tp in 1:Time) {
 years = c(1983:2014)
 for (t in 1:Time){
   mname = paste0(years[t], "overallthirddegree", ".png")
- # print(pp[[t]]+labs(x = "thirdDegree (in million)"))
-#  ggsave(filename = mname, width = 11, height = 6)
+  print(pp[[t]]+labs(x = "thirdDegree (in million)"))
+  ggsave(filename = mname, width = 11, height = 6)
 }
 
 datacollapse = data.frame(Proportion = datacollapse[,1]/Time, thirdDegree =as.factor(as.numeric(as.character(datamat3$thirdDegree))*1000000), Model = datamat3$Model)
@@ -983,140 +722,6 @@ observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, thirdDegre
 datacollapse$thirdDegree =as.factor(paste0(substr(datacollapse$thirdDegree, 1, 3), ""))
 datacollapse2$thirdDegree =as.factor(paste0(substr(datacollapse2$thirdDegree, 1, 3), ""))
 observedcollapse$thirdDegree =as.factor(paste0(substr(observedcollapse$thirdDegree, 1, 3), ""))
-pp = ggplot(datacollapse, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-#pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+#pp = ggplot(datacollapse, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
+pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
 pp+labs(x = "thirdDegree (in million)")
-
-
-
-
-datacollapse = data.frame(Proportion = datacollapse[,1]/Time, thirdDegree = datamat3$thirdDegree, Model = datamat3$Model)
-observedcollapse = data.frame(Proportion = observedcollapse[,1]/Time, thirdDegree = observed$thirdDegree, Model = observed$Model)
-pp = ggplot(datacollapse, aes(x = thirdDegree, y = Proportion,fill = Model, color =Model)) + geom_boxplot(outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha(ggcolors, 0.5)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank())
-datacollapse2 = datacollapse[datacollapse$Model == "DAME",]
-#pp = ggplot(datacollapse2, aes(x = thirdDegree, y = Proportion)) + geom_boxplot(colour = "black", outlier.size = 0.5, position = position_dodge()) + theme_minimal()+scale_fill_manual(values = alpha("black", 0.2)) + geom_line(data = observedcollapse, color = "blue", size = 0.2, group = 1)+geom_point(data =observedcollapse, color = "blue", size =2, group = 1)+guides(colour = guide_legend(override.aes = list(shape = NA))) + theme(legend.title = element_blank()) + xlab("thirdDegree (in million)")
-pp
-
-
-
-
-#convergence check
-library(coda)
-  meaningful_NA_rows = lapply(1:Time, function(tp) {
-    which(avail1[tp,]==0)
-  })
-Dout = matrix(NA, nrow = 32, ncol = 0)
-Dnew = UN$DPS
-Unew = UN$UPS
-for (i in 1:2000) {
-		UDUPM = list()
-		for (t in 1:32) {
-			U = UN$UPS[[t]][,c(2*i-1, i*2)]
-			UDUPM[[t]] = U %*% diag(UN$DPS[[t]][i,]) %*% t(U)
-		}
-		 eULU = lapply(1:Time, function(tp) {
-    	exclude = meaningful_NA_rows[[tp]]
-    	if (length(exclude) > 0) {
-     	 eigentp = eigen(UDUPM[[tp]][-exclude, -exclude])
-    	} else {
-      	eigentp = eigen(UDUPM[[tp]])
-    	}
-    	eigentp
-  		})
-  		eR = lapply(1:Time, function(tp) {
-    	which(rank(-abs(eULU[[tp]]$val), ties.method = "first") <= 2)
-  		})
- 	 	L =  lapply(1:Time, function(tp){
-    	eULU[[tp]]$val[eR[[tp]]]
-  		})
-  		eV =  lapply(1:Time, function(tp){
-    	eULU[[tp]]$vec[,eR[[tp]]]
-  		})
-  		for (t in 1:32) {
-  			Dnew[[t]][i,] = L[[t]]
-  			if (length(meaningful_NA_rows[[t]]) > 0) {
-  				exclude = meaningful_NA_rows[[t]]
-  				Unew[[t]][-exclude,2*i] = eV[[t]][,2]	
-  				Unew[[t]][-exclude,2*i-1] = eV[[t]][,1]			
-  			} else {
-  			Unew[[t]][,2*i] = eV[[t]][,2]	
-  			Unew[[t]][,2*i-1] = eV[[t]][,1]			
-  			}
-  		}
-}	
-
-
-output = c()
-for (i in 1:32) {
-	for (j in 1:6) {
-	s = gelman.diag(mcmc.list(mcmc(UN$BETA[[i]][1:1000,j]), mcmc(UN$BETA[[i]][1001:2000,j])))
-	output = rbind(output, c(i, j, unlist(s)))
-	}
-}
-
-output2 = c()
-for (i in 1:32) {
-	for (j in 1:97) {
-	s = gelman.diag(mcmc.list(mcmc(UN$theta[[i]][1:1000,j]), mcmc(UN$theta[[i]][1001:2000,j])))
-	output2 = rbind(output2, c(i, j, unlist(s)))
-	}
-}
-
-output3 = c()
-for (j in 1:9) {
-	s = gelman.diag(mcmc.list(mcmc(UN$tau[1:1000, j]), mcmc(UN$tau[1001:2000,j])))
-	output3 = rbind(output3, c(j, unlist(s)))
-}
-
-output4 = c()
-for (j in 1:9) {
-	s = gelman.diag(mcmc.list(mcmc(UN$kappas[1:1000, j]), mcmc(UN$kappas[1001:2000,j])))
-	output4 = rbind(output4, c(j, unlist(s)))
-}
-
-output5 = c()
-for (i in 1:32) {
-	for (j in 1:2) {
-		s = gelman.diag(mcmc.list(mcmc(Dnew[[i]][1:1000, j]), mcmc(Dnew[[i]][1001:2000,j])))
-		output5 = rbind(output5, c(i, j, unlist(s)))
-	}
-}
-
-output6 = c()
-for (i in 1:32) {
-	for (j in 1:97) {
-		s = gelman.diag(mcmc.list(mcmc(Unew[[i]][j, 2*(1:1000)-1]), mcmc(Unew[[i]][j, 2*(1001:2000)-1])))
-		output6 = rbind(output6, c(i, j, unlist(s)))
-	}
-}
-
-output7 = c()
-for (i in 1:32) {
-	for (j in 1:97) {
-		s = gelman.diag(mcmc.list(mcmc(Unew[[i]][j, 2*(1:1000)]), mcmc(Unew[[i]][j, 2*(1001:2000)])))
-		output7 = rbind(output7, c(i, j, unlist(s)))
-	}
-}
-
-gelman.diag = list(beta = output, theta = output2, tau = output3, kappa = output4, D = output5, U1 = output6, U2 = output7)
-save(gelman.diag, file = "/Users/bomin8319/Desktop/gelmandiag.RData")
-
-
-
-
-for (d in 1:Time){
-  diag(Y[d,, ])= 0
-  Y[d, which(avail1[d,]==0), ] = 0
-  Y[d, , which(avail1[d,]==0)] = 0
-  Y[d, , ][which(is.na(Y[d, , ]))] = 0	
-} 
-error = list()
-for (t in 1:32){
-  error[[t]] = (Y[t,,][upper.tri(Y[t,,])])*100 - UN$YPM[[t]][upper.tri(UN$YPM[[t]])]
-}
-
-error = unlist(error)
-error = data.frame(residual = error[-which(error==0)])
-#error = error[-which(error==0),]
-ggplot(error, aes(x=residual)) + geom_histogram(binwidth = 0.5, fill = "grey", color = "black")+ xlim(-15, 15) +
-  geom_density(alpha=.7, fill="#FF6666") + scale_color_grey() + theme_minimal()
